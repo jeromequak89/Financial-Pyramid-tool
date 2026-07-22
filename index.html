@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Pyramid — Client Planning Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #14213D; --navy-deep: #0B1526; --parchment: #F7F5F0;
+    --brass: #B0894F; --brass-light: #D9BC8C; --slate: #5B6472;
+    --line: #DCD7CC; --rust: #A44A3F; --moss: #3F6B4F; --white: #FFFFFF;
+    --shadow: 0 8px 24px rgba(20,33,61,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--parchment);color:var(--navy-deep);font-family:'Inter','Noto Sans SC',sans-serif;-webkit-font-smoothing:antialiased;}
+  .app{max-width:1280px;margin:0 auto;padding:28px 24px 80px;}
+
+  header.top{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--navy);padding-bottom:18px;margin-bottom:16px;gap:24px;flex-wrap:wrap;}
+  .brandrow{display:flex;align-items:center;gap:16px;}
+  .logo{height:46px;width:auto;flex-shrink:0;}
+  .brandblock .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin:0 0 6px;}
+  .brandblock h1{font-family:'Fraunces',serif;font-weight:600;font-size:34px;margin:0;color:var(--navy-deep);letter-spacing:-.01em;}
+  .brandblock p.tag{margin:6px 0 0;color:var(--slate);font-size:13.5px;font-style:italic;}
+  .headeractions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .confidential{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;color:var(--slate);text-align:center;padding:6px 0 18px;border-bottom:1px solid var(--line);margin-bottom:16px;}
+  .confidential b{color:var(--rust);}
+  button.ghost{background:transparent;border:1.5px solid var(--navy);color:var(--navy);font-family:inherit;font-weight:600;font-size:12.5px;padding:9px 14px;border-radius:3px;cursor:pointer;letter-spacing:.02em;}
+  button.ghost:hover{background:var(--navy);color:var(--white);}
+  button.solid{background:var(--navy);border:1.5px solid var(--navy);color:var(--white);font-family:inherit;font-weight:600;font-size:12.5px;padding:9px 14px;border-radius:3px;cursor:pointer;}
+  button.solid:hover{background:var(--navy-deep);}
+  button.brass{background:var(--brass);border:1.5px solid var(--brass);color:var(--white);font-family:inherit;font-weight:600;font-size:12px;padding:7px 12px;border-radius:3px;cursor:pointer;}
+  button.brass:hover{background:#96733f;}
+  button:disabled{opacity:.45;cursor:not-allowed;}
+
+  .toolbar{background:var(--white);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .toolbar label.tlabel{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--slate);font-weight:600;margin-right:2px;}
+  .toolbar select{font-family:inherit;font-size:12.5px;padding:7px 8px;border:1.5px solid var(--line);border-radius:3px;background:var(--white);color:var(--navy-deep);min-width:160px;}
+  .toolbar .status{font-size:11.5px;color:var(--moss);font-weight:600;min-width:80px;}
+
+  .clientbar{background:var(--white);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);padding:18px 22px;margin-bottom:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px 20px;}
+  .field label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--slate);margin-bottom:5px;font-weight:600;}
+  .field input,.field select{width:100%;border:none;border-bottom:1.5px solid var(--line);background:transparent;padding:6px 2px;font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--navy-deep);font-weight:600;outline:none;}
+  .field input:focus{border-bottom-color:var(--brass);}
+  .field .hint{font-size:10.5px;color:var(--slate);margin-top:3px;font-family:inherit;font-weight:400;}
+
+  .tabs{display:flex;gap:2px;margin-bottom:22px;border-bottom:1px solid var(--line);}
+  .tab{font-family:'Fraunces',serif;font-weight:600;font-size:15px;padding:11px 22px;cursor:pointer;color:var(--slate);border-bottom:3px solid transparent;user-select:none;}
+  .tab.active{color:var(--navy-deep);border-bottom-color:var(--brass);}
+  .panel{display:none;}
+  .panel.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .layout{display:grid;grid-template-columns:360px 1fr;gap:22px;align-items:start;}
+  @media (max-width:880px){.layout{grid-template-columns:1fr;}}
+
+  .card{background:var(--white);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px;}
+  .card h3{font-family:'Fraunces',serif;font-size:16px;margin:0 0 14px;color:var(--navy-deep);display:flex;align-items:center;gap:8px;}
+  .card h3 .n{background:var(--navy);color:var(--white);font-family:'IBM Plex Mono';font-size:11px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .field.compact input{font-size:16px;}
+  .radiorow{display:flex;gap:14px;margin-top:2px;flex-wrap:wrap;}
+  .radiorow label{font-size:12.5px;color:var(--navy-deep);display:flex;align-items:center;gap:5px;font-weight:500;cursor:pointer;}
+  .checkline{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--navy-deep);margin-top:4px;cursor:pointer;}
+
+  .pyramidwrap{background:var(--white);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);padding:26px;}
+  .pyramidwrap h3{font-family:'Fraunces',serif;margin:0 0 4px;font-size:18px;text-align:center;}
+  .pyramidwrap .sub{color:var(--slate);font-size:12.5px;font-style:italic;margin-bottom:18px;text-align:center;}
+  .pyramid-flex{display:flex;gap:26px;align-items:center;flex-wrap:wrap;justify-content:center;}
+  .pyramid-svg{width:270px;flex-shrink:0;}
+  .pyramid-legend{flex:1;min-width:260px;display:flex;flex-direction:column;gap:10px;}
+  .legend-item{display:flex;align-items:flex-start;gap:10px;}
+  .legend-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0;margin-top:2px;}
+  .legend-text .l-label{font-weight:700;font-size:13px;color:var(--navy-deep);}
+  .legend-text .l-value{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--slate);margin-top:1px;}
+  .legend-text .l-flag{font-size:11px;font-weight:600;margin-top:2px;}
+
+  .tablewrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.sum{width:100%;min-width:480px;border-collapse:collapse;font-size:13px;}
+  table.sum th{text-align:right;font-family:'IBM Plex Mono';font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--slate);padding:8px 10px;border-bottom:1.5px solid var(--navy);}
+  table.sum th:first-child{text-align:left;}
+  table.sum td{padding:10px 10px;border-bottom:1px solid var(--line);text-align:right;font-family:'IBM Plex Mono';font-size:13px;}
+  table.sum td:first-child{text-align:left;font-family:inherit;font-weight:600;font-size:13px;}
+  .shortfall-neg{color:var(--rust);font-weight:700;}
+  .shortfall-ok{color:var(--moss);font-weight:700;}
+  .barcell{width:170px;}
+  .bartrack{background:var(--line);height:8px;border-radius:4px;overflow:hidden;}
+  .barfill{height:100%;background:var(--moss);}
+
+  .goalrow{display:grid;grid-template-columns:1.4fr .8fr .6fr .9fr auto;gap:8px;align-items:end;margin-bottom:10px;}
+  .goalrow input{width:100%;}
+  .rmv{background:none;border:none;color:var(--rust);cursor:pointer;font-size:16px;padding:4px;}
+  .addgoal{font-family:inherit;font-weight:600;font-size:12px;color:var(--brass);background:none;border:1px dashed var(--brass-light);border-radius:4px;padding:7px 14px;cursor:pointer;margin-top:4px;}
+  .addgoal:hover{background:#FBF6EE;}
+
+  .notebox{background:#FBF8F1;border:1px solid var(--brass-light);border-left:3px solid var(--brass);border-radius:4px;padding:12px 14px;font-size:12.5px;color:var(--navy-deep);margin-top:10px;line-height:1.5;}
+  .plainnote{font-size:11.5px;color:var(--slate);margin-top:10px;font-style:italic;}
+  .flagwarn{color:var(--rust);font-weight:600;}
+  .flagok{color:var(--moss);font-weight:600;}
+
+  .rule72{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .rule72 .field{max-width:110px;}
+  .rule72out{font-family:'IBM Plex Mono';font-size:15px;font-weight:700;color:var(--navy-deep);}
+
+  .cta{border-radius:6px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 14px rgba(164,74,63,0.25);}
+  .cta.danger{background:#B23B2E;border:1.5px solid #8E2E24;}
+  .cta.ok{background:var(--moss);border:1.5px solid #2f5540;}
+  .cta .icon{font-size:26px;color:#fff;flex-shrink:0;}
+  .cta .txt{color:#fff;}
+  .cta .txt .main{font-family:'Fraunces',serif;font-weight:700;font-size:16px;}
+  .cta .txt .sub{font-size:12px;opacity:.92;margin-top:3px;}
+  .cta .ctalist{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:5px;}
+  .cta .ctalist li{color:#fff;font-size:13px;}
+  .cta .ctalist .rank{opacity:.8;font-weight:600;margin-right:2px;}
+
+  @media print{.headeractions,.tabs,.toolbar{display:none !important;}.panel{display:block !important;}body{background:#fff;}}
+
+  /* Phone: goal rows become stacked mini-cards instead of a cramped 5-column grid */
+  @media (max-width:600px){
+    .app{padding:16px 14px 60px;}
+    .brandblock h1{font-size:26px;}
+    .card,.pyramidwrap,.clientbar,.toolbar{padding:16px;}
+    .goalrow{grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:6px;padding:10px 10px 14px;gap:8px;position:relative;}
+    .goalrow > :first-child{grid-column:1/-1;}
+    .goalrow input{min-height:38px;}
+    .rmv{position:absolute;top:6px;right:8px;font-size:18px;padding:6px;}
+    button.ghost,button.solid,button.brass{padding:11px 14px;min-height:40px;}
+    .tab{padding:11px 14px;font-size:13.5px;}
+    .pyramid-svg{width:100%;max-width:230px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div class="brandrow">
+      <img class="logo" src="data:image/png;base64,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" alt="Financial Architects Advisory">
+      <div class="brandblock">
+        <p class="eyebrow" id="t-eyebrow">Client Planning Worksheet</p>
+        <h1 id="t-title">Financial Pyramid</h1>
+        <p class="tag" id="t-tagline">"What you cannot protect is not yours."</p>
+      </div>
+    </div>
+    <div class="headeractions">
+      <button class="ghost" id="langBtn">中文</button>
+      <button class="ghost" id="resetBtn">Reset</button>
+      <button class="solid" id="printBtn">Print / Save PDF</button>
+    </div>
+  </header>
+
+  <div class="confidential" id="confidentialNotice"></div>
+
+  <div class="toolbar">
+    <span class="tlabel" id="t-savedclients">Saved clients</span>
+    <select id="savedClientSelect"><option value="" id="t-selectopt">— select —</option></select>
+    <button class="ghost" id="loadClientBtn">Load</button>
+    <button class="ghost" id="deleteClientBtn">Delete</button>
+    <button class="brass" id="saveClientBtn">Save this client</button>
+    <span class="status" id="clientStatus"></span>
+  </div>
+
+  <div class="clientbar">
+    <div class="field"><label id="t-clientname">Client name</label><input id="clientName" placeholder="—"></div>
+    <div class="field"><label id="t-age">Age</label><input id="clientAge" type="number" placeholder="—"></div>
+    <div class="field"><label id="t-netmonthly">Net monthly income</label><input id="netMonthly" type="number" placeholder="0"><div class="hint" id="t-netmonthlyhint">take-home, after CPF/tax</div></div>
+    <div class="field"><label id="t-expenses">Monthly expenses</label><input id="monthlyExpenses" type="number" placeholder="0"></div>
+    <div class="field"><label id="t-yearsdep">Yrs to youngest dependent working</label><input id="yearsDependent" type="number" placeholder="0"><div class="hint" id="t-yearsdephint">0 if no dependents</div></div>
+    <div class="field"><label id="t-avgdrawn">Avg. monthly drawn income</label><input id="avgDrawnIncome" type="number" placeholder="same as net monthly"><div class="hint" id="t-avgdrawnhint">for income protection calc</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="protection" id="t-tabprotection">Wealth Protection</div>
+    <div class="tab" data-tab="accumulation" id="t-tabaccumulation">Wealth Accumulation</div>
+    <div class="tab" data-tab="summary" id="t-tabsummary">Summary &amp; Shortfall</div>
+  </div>
+
+  <div class="panel active" id="panel-protection">
+    <div class="layout">
+      <div class="inputs">
+        <div class="card">
+          <h3><span class="n">1</span><span id="t-c1h">Death &amp; TPD</span></h3>
+          <div class="radiorow">
+            <label><input type="radio" name="dtpdMethod" value="10x" checked> <span id="t-dtpd10x">×10 annual income</span></label>
+            <label><input type="radio" name="dtpdMethod" value="years"> <span id="t-dtpdyears">Years to dependent-independence</span></label>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <div class="field compact"><label id="t-existdtpd">Existing Death/TPD coverage</label><input id="existDeathTPD" type="number" placeholder="0"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3><span class="n">2</span><span id="t-c2h">Critical &amp; Early Critical Illness</span></h3>
+          <div class="row">
+            <div class="field compact"><label id="t-existci">Existing CI coverage</label><input id="existCI" type="number" placeholder="0"></div>
+            <div class="field compact"><label id="t-existeci">Existing ECI coverage</label><input id="existECI" type="number" placeholder="0"></div>
+          </div>
+          <div class="notebox" id="t-c2note">CI required = $150,000 + 5× annual income. ECI required = higher of $150,000 or 25% of CI required.</div>
+        </div>
+
+        <div class="card">
+          <h3><span class="n">3</span><span id="t-c3h">Accident &amp; Hospitalisation</span></h3>
+          <div class="row">
+            <div class="field compact"><label id="t-existaccident">Existing accident coverage</label><input id="existAccident" type="number" placeholder="0"></div>
+          </div>
+          <label class="checkline"><input type="checkbox" id="hasISP"> <span id="t-isp">Has Integrated Shield Plan + Rider (≈95% of medical bills covered)</span></label>
+          <div class="notebox" id="t-c3note">Accident cover tops up Death/TPD to a combined $1,000,000.</div>
+        </div>
+
+        <div class="card">
+          <h3><span class="n">4</span><span id="t-c4h">Long-Term Care &amp; Income Protection</span></h3>
+          <div class="row">
+            <div class="field compact"><label id="t-ltcdesired">Desired LTC monthly payout</label><input id="ltcMonthly" type="number" placeholder="0"></div>
+            <div class="field compact"><label id="t-ltcexist">Existing LTC monthly payout</label><input id="existLTC" type="number" placeholder="0"></div>
+          </div>
+          <div class="row">
+            <div class="field compact"><label id="t-existip">Existing income protection (monthly)</label><input id="existIP" type="number" placeholder="0"></div>
+          </div>
+          <div class="notebox" id="t-c4note">Income Protection required = 75% of average monthly drawn income. LTC lump-sum reserve = 3× desired monthly payout, for 2/3-of-6-ADL failure.</div>
+        </div>
+      </div>
+
+      <div class="visual">
+        <div class="pyramidwrap">
+          <h3 id="t-ppyrh">Wealth Protection Pyramid</h3>
+          <p class="sub" id="t-ppyrsub">Required coverage, calculated live from client inputs</p>
+          <div id="protectionPyramid"></div>
+          <div class="notebox" id="protectionBudgetNote"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-accumulation">
+    <div class="layout">
+      <div class="inputs">
+        <div class="card">
+          <h3><span class="n">1</span><span id="t-a1h">Emergency Fund</span></h3>
+          <div class="notebox" id="t-a1note">Target = 3 to 6 months of monthly expenses. Uses the expenses figure entered above.</div>
+        </div>
+
+        <div class="card">
+          <h3><span class="n">2</span><span id="t-a2h">Goals &amp; Aspirations</span></h3>
+          <p style="font-size:12px;color:var(--slate);margin:0 0 10px;" id="t-a2sub">What do they want? How long do they have? How much do they need?</p>
+          <div id="goalRows"></div>
+          <button class="addgoal" id="addGoalBtn">+ <span id="t-addgoal">Add goal</span></button>
+        </div>
+
+        <div class="card">
+          <h3><span class="n">3</span><span id="t-a3h">Must-Know: Rule of 72</span></h3>
+          <div class="rule72">
+            <div class="field compact"><label id="t-roi">Assumed ROI %</label><input id="rule72roi" type="number" value="5" step="0.5"></div>
+            <div>
+              <div style="font-size:11px;color:var(--slate);margin-bottom:2px;" id="t-doubleyrs">Years to double money</div>
+              <div class="rule72out" id="rule72out">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual">
+        <div class="pyramidwrap">
+          <h3 id="t-apyrh">Wealth Accumulation Pyramid</h3>
+          <p class="sub" id="t-apyrsub">Recommended monthly allocation of net income</p>
+          <div id="accumulationPyramid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-summary">
+    <div class="cta" id="ctaBanner"></div>
+
+    <div class="card">
+      <h3><span class="n">§</span><span id="t-s1h">Coverage: Required vs Existing vs Shortfall</span></h3>
+      <div class="tablewrap"><table class="sum" id="shortfallTable">
+        <thead><tr><th id="t-thbenefit">Benefit</th><th id="t-threq">Required</th><th id="t-thex">Existing</th><th id="t-thshort">Shortfall</th><th class="barcell" id="t-thcov">Coverage</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <div class="plainnote" id="t-s1note">These figures cover different risks and are not meant to be added into a single total.</div>
+    </div>
+
+    <div class="card">
+      <h3><span class="n">§</span><span id="t-s2h">Monthly Cash-Flow Allocation Check</span></h3>
+      <div class="tablewrap"><table class="sum" id="cashflowTable">
+        <thead><tr><th id="t-thbucket">Bucket</th><th id="t-thmid">Recommended (mid-point)</th><th id="t-thrange">Recommended range</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <div class="notebox" id="cashflowNote"></div>
+    </div>
+
+    <div class="card">
+      <h3><span class="n">§</span><span id="t-s3h">Goal Savings vs Capacity</span></h3>
+      <div class="notebox" id="goalCapacityNote"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const STR = {
+en: {
+  eyebrow:"Client Planning Worksheet", title:"Financial Pyramid", tagline:"\u201CWhat you cannot protect is not yours.\u201D",
+  reset:"Reset", print:"Print / Save PDF", langBtn:"中文",
+  savedclients:"Saved clients", selectopt:"— select —", load:"Load", del:"Delete", save:"Save this client",
+  statusSaved:"Saved ✓", statusLoaded:"Loaded ✓", statusDeleted:"Deleted", alertName:"Enter a client name first.",
+  alertSelect:"Select a saved client to load.", confirmDelete:function(n){ return 'Delete saved client "'+n+'"?'; },
+  confidentialNamed:function(n){ return 'CONFIDENTIAL — Prepared for '+n+' by Financial Architects Advisory. For the intended recipient only. Not for redistribution.'; },
+  confidentialGeneric:"CONFIDENTIAL — Prepared by Financial Architects Advisory. For the intended recipient only. Not for redistribution.",
+  clientname:"Client name", age:"Age", netmonthly:"Net monthly income", netmonthlyhint:"take-home, after CPF/tax",
+  expenses:"Monthly expenses", yearsdep:"Yrs to youngest dependent working", yearsdephint:"0 if no dependents",
+  avgdrawn:"Avg. monthly drawn income", avgdrawnhint:"for income protection calc",
+  tabprotection:"Wealth Protection", tabaccumulation:"Wealth Accumulation", tabsummary:"Summary & Shortfall",
+  c1h:"Death & TPD", dtpd10x:"×10 annual income", dtpdyears:"Years to dependent-independence", existdtpd:"Existing Death/TPD coverage",
+  c2h:"Critical & Early Critical Illness", existci:"Existing CI coverage", existeci:"Existing ECI coverage",
+  c2note:"CI required = $150,000 + 5× annual income. ECI required = higher of $150,000 or 25% of CI required.",
+  c3h:"Accident & Hospitalisation", existaccident:"Existing accident coverage",
+  isp:"Has Integrated Shield Plan + Rider (≈95% of medical bills covered)",
+  c3note:"Accident cover tops up Death/TPD to a combined $1,000,000.",
+  c4h:"Long-Term Care & Income Protection", ltcdesired:"Desired LTC monthly payout", ltcexist:"Existing LTC monthly payout",
+  existip:"Existing income protection (monthly)",
+  c4note:"Income Protection required = 75% of average monthly drawn income. LTC lump-sum reserve = 3× desired monthly payout, for 2/3-of-6-ADL failure.",
+  ppyrh:"Wealth Protection Pyramid", ppyrsub:"Required coverage, calculated live from client inputs",
+  a1h:"Emergency Fund", a1note:"Target = 3 to 6 months of monthly expenses. Uses the expenses figure entered above.",
+  a2h:"Goals & Aspirations", a2sub:"What do they want? How long do they have? How much do they need?",
+  addgoal:"Add goal", goalName:"Goal", goalTarget:"Target $", goalYears:"Years", goalPerMonth:"Per month", goalPlaceholder:"e.g. Retirement",
+  a3h:"Must-Know: Rule of 72", roi:"Assumed ROI %", doubleyrs:"Years to double money",
+  apyrh:"Wealth Accumulation Pyramid", apyrsub:"Recommended monthly allocation of net income",
+  s1h:"Coverage: Required vs Existing vs Shortfall", thbenefit:"Benefit", threq:"Required", thex:"Existing", thshort:"Shortfall", thcov:"Coverage",
+  fullyfunded:"Fully funded", s1note:"These figures cover different risks and are not meant to be added into a single total.",
+  s2h:"Monthly Cash-Flow Allocation Check", thbucket:"Bucket", thmid:"Recommended (mid-point)", thrange:"Recommended range",
+  s3h:"Goal Savings vs Capacity",
+  rowDeathTPD:"Death / TPD", rowCI:"Critical Illness", rowECI:"Early CI", rowAccident:"Accident (to $1M)",
+  rowIP:"Income Protection (/mo)", rowLTC:"Long-Term Care (/mo)",
+  cfExpenses:"Expenses (cap 40%)", cfProtection:"Wealth Protection (15% ±5%)", cfMid:"Save/Invest Mid-term (25% ±5%)", cfLong:"Invest Long-term (20% ±5%)",
+  ctaHeader:function(c){ return '⚠ PRIORITY ACTION — '+c+' coverage gap'+(c>1?'s':'')+' to close'; },
+  ctaDangerSub:"Work through in this order before discussing accumulation:",
+  ctaOk:"✓ ALL MEASURED COVERAGE IS FULLY FUNDED", ctaOkSub:"Safe to move to the accumulation conversation.",
+  cfNote:function(NM,alloc,rem,over){ return 'Against net monthly income of '+NM+', mid-point allocations total '+alloc+', leaving '+rem+' '+(over ? '— over-allocated, revisit expenses or bucket sizing.' : 'unassigned / discretionary.'); },
+  cfNoneNote:"Enter net monthly income above to see the allocation check.",
+  goalNote:function(need,cap,over,delta){ return 'Goals currently require '+need+'/mo in total, against a recommended savings/investment capacity of '+cap+'/mo (mid-point of the two accumulation buckets). '+(over ? 'Shortfall of '+delta+'/mo — extend timelines, reduce targets, or free up cash flow.' : 'Within capacity, with '+delta+'/mo of headroom.'); },
+  goalNoneNote:"Enter net monthly income to compare goal savings against capacity.",
+  budgetNote:function(low,high,mid){ return 'Recommended premium budget for Wealth Protection: '+low+' – '+high+' per month (mid-point '+mid+'), i.e. 15% ±5% of net income.'; },
+  expOver:function(amt){ return 'Expenses exceed the 40% guideline by '+amt+'/mo.'; }, expOk:"Expenses within the 40% guideline.",
+  altYears:function(amt){ return 'Alternative Death/TPD basis (years-to-independence): '+amt+'.'; }, alt10x:function(amt){ return 'Alternative Death/TPD basis (×10 annual income): '+amt+'.'; },
+  bandsProtection:[
+    {l:"Death & TPD", r:"\u00D710 annual income, or years to youngest dependent's independence"},
+    {l:"Critical Illness", r:"$150,000 + 5\u00D7 annual income"},
+    {l:"Early CI", r:"higher of $150,000 or 25% of CI"},
+    {l:"Accident", r:"tops up Death/TPD to a combined $1,000,000"},
+    {l:"Hospitalisation", r:"\u224895% of bills via ISP + Rider"},
+    {l:"Long-Term Care", r:"monthly payout + 3\u00D7 lump sum"},
+    {l:"Income Protection", r:"up to 75% of average drawn income"}
+  ],
+  bandsAccumulation:[
+    {l:"Wealth Distribution", r:"legacy and estate planning"},
+    {l:"Invest, Long-term (>15y)", r:"20% (\u00B15%) of net income"},
+    {l:"Save/Invest, Mid-term (5\u201315y)", r:"25% (\u00B15%) of net income"},
+    {l:"Emergency Fund", r:"3 to 6 months of expenses"}
+  ]
+},
+zh: {
+  eyebrow:"客户规划工作表", title:"财务金字塔", tagline:"“无法保障的，就不属于你。”",
+  reset:"重置", print:"打印 / 保存PDF", langBtn:"EN",
+  savedclients:"已保存客户", selectopt:"— 请选择 —", load:"载入", del:"删除", save:"保存此客户",
+  statusSaved:"已保存 ✓", statusLoaded:"已载入 ✓", statusDeleted:"已删除", alertName:"请先填写客户姓名。",
+  alertSelect:"请选择要载入的客户。", confirmDelete:function(n){ return '确定要删除已保存的客户「'+n+'」吗？'; },
+  confidentialNamed:function(n){ return '保密文件 — 由 Financial Architects Advisory 为'+n+'编制，仅供收件人查阅，请勿转发。'; },
+  confidentialGeneric:"保密文件 — 由 Financial Architects Advisory 编制，仅供收件人查阅，请勿转发。",
+  clientname:"客户姓名", age:"年龄", netmonthly:"每月净收入", netmonthlyhint:"实收款项（扣除公积金/税后）",
+  expenses:"每月支出", yearsdep:"距最小受抚养人开始工作年数", yearsdephint:"若无受抚养人则填0",
+  avgdrawn:"平均每月提取收入", avgdrawnhint:"用于收入保障计算",
+  tabprotection:"财富保障", tabaccumulation:"财富累积", tabsummary:"总结与缺口",
+  c1h:"身故与全残保障", dtpd10x:"年收入的10倍", dtpdyears:"至受抚养人经济独立的年数", existdtpd:"现有身故/全残保额",
+  c2h:"重大疾病与早期重疾", existci:"现有重疾保额", existeci:"现有早期重疾保额",
+  c2note:"所需重疾保额 = $150,000 + 年收入 × 5。所需早期重疾保额 = $150,000 与重疾保额25%中的较高者。",
+  c3h:"意外与住院保障", existaccident:"现有意外保额",
+  isp:"已投保综合健保双全计划及附加险（约可承担95%医疗费用）",
+  c3note:"意外保障用于将身故/全残保额补足至合计$1,000,000。",
+  c4h:"长期护理与收入保障", ltcdesired:"期望的长期护理每月赔付", ltcexist:"现有长期护理每月赔付",
+  existip:"现有收入保障（每月）",
+  c4note:"所需收入保障 = 平均每月提取收入的75%。长期护理一次性储备 = 期望每月赔付的3倍，适用于6项日常生活能力中2/3项丧失的情况。",
+  ppyrh:"财富保障金字塔", ppyrsub:"所需保额，根据客户资料实时计算",
+  a1h:"紧急备用金", a1note:"目标 = 每月支出的3至6倍，依据上方填写的支出金额计算。",
+  a2h:"目标与愿望", a2sub:"他们想要什么？还有多长时间？需要多少钱？",
+  addgoal:"添加目标", goalName:"目标", goalTarget:"目标金额", goalYears:"年数", goalPerMonth:"每月", goalPlaceholder:"例如：退休",
+  a3h:"必知法则：72法则", roi:"假设投资回报率 %", doubleyrs:"资金翻倍所需年数",
+  apyrh:"财富累积金字塔", apyrsub:"建议的每月净收入分配",
+  s1h:"保障：所需 vs 现有 vs 缺口", thbenefit:"项目", threq:"所需", thex:"现有", thshort:"缺口", thcov:"保障进度",
+  fullyfunded:"已足额", s1note:"以上金额分别对应不同风险类别，不应直接相加为单一总额。",
+  s2h:"每月现金流分配检查", thbucket:"类别", thmid:"建议金额（中位数）", thrange:"建议范围",
+  s3h:"目标储蓄 vs 储蓄能力",
+  rowDeathTPD:"身故 / 全残", rowCI:"重大疾病", rowECI:"早期重疾", rowAccident:"意外（补足至$1M）",
+  rowIP:"收入保障（每月）", rowLTC:"长期护理（每月）",
+  cfExpenses:"支出（上限40%）", cfProtection:"财富保障（15%±5%）", cfMid:"中期储蓄/投资（25%±5%）", cfLong:"长期投资（20%±5%）",
+  ctaHeader:function(c){ return '⚠ 优先处理 — 共'+c+'项保障缺口待补足'; },
+  ctaDangerSub:"请按以下顺序处理，再讨论财富累积：",
+  ctaOk:"✓ 所有已评估的保障均已足额", ctaOkSub:"可以放心进入财富累积的讨论。",
+  cfNote:function(NM,alloc,rem,over){ return '每月净收入为'+NM+'，各类别中位数分配合计'+alloc+'，剩余'+rem+(over ? '——分配超支，请重新检视支出或各类别比例。' : '，为未分配／可自由支配金额。'); },
+  cfNoneNote:"请在上方填写每月净收入以查看分配检查。",
+  goalNote:function(need,cap,over,delta){ return '目前的目标合计每月需要'+need+'，而建议的储蓄／投资能力为每月'+cap+'（两个财富累积类别的中位数）。'+(over ? '每月缺口为'+delta+'——请延长年限、降低目标金额，或释放更多现金流。' : '在能力范围内，每月尚余'+delta+'空间。'); },
+  goalNoneNote:"请填写每月净收入以比较目标储蓄与储蓄能力。",
+  budgetNote:function(low,high,mid){ return '财富保障建议保费预算：每月'+low+'至'+high+'（中位数'+mid+'），即净收入的15%±5%。'; },
+  expOver:function(amt){ return '支出超出40%的建议上限，每月超出'+amt+'。'; }, expOk:"支出在40%建议范围内。",
+  altYears:function(amt){ return '身故/全残保额的另一计算方式（至独立年数）：'+amt+'。'; }, alt10x:function(amt){ return '身故/全残保额的另一计算方式（年收入的10倍）：'+amt+'。'; },
+  bandsProtection:[
+    {l:"身故与全残", r:"年收入的10倍，或至最小受抚养人独立的年数"},
+    {l:"重大疾病", r:"$150,000 + 年收入×5"},
+    {l:"早期重疾", r:"$150,000 与重疾保额25%中的较高者"},
+    {l:"意外", r:"补足身故/全残保额至合计$1,000,000"},
+    {l:"住院", r:"通过ISP及附加险承担约95%医疗费用"},
+    {l:"长期护理", r:"每月赔付 + 3倍一次性赔付"},
+    {l:"收入保障", r:"最高为平均提取收入的75%"}
+  ],
+  bandsAccumulation:[
+    {l:"财富分配", r:"传承与遗产规划"},
+    {l:"长期投资（15年以上）", r:"净收入的20%（±5%）"},
+    {l:"中期储蓄/投资（5至15年）", r:"净收入的25%（±5%）"},
+    {l:"紧急备用金", r:"3至6个月的支出"}
+  ]
+}
+};
+let lang = 'en';
+function L(){ return STR[lang]; }
+
+const $ = function(id){ return document.getElementById(id); };
+const num = function(v){ const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const money = function(n){ return '$' + Math.round(n).toLocaleString('en-US'); };
+const clamp0 = function(n){ return Math.max(0, n); };
+
+const BAND_COLORS_P = ['#14213D','#1E2E52','#2A3D67','#3A4F7E','#3F6B4F','#B0894F','#8C6A38'];
+const BAND_COLORS_A = ['#14213D','#2A3D67','#3A4F7E','#B0894F'];
+
+function applyStaticText(){
+  const s = L();
+  const map = {
+    't-eyebrow':'eyebrow','t-title':'title','t-tagline':'tagline','resetBtn':'reset','printBtn':'print','langBtn':'langBtn',
+    't-savedclients':'savedclients','t-selectopt':'selectopt','loadClientBtn':'load','deleteClientBtn':'del','saveClientBtn':'save',
+    't-clientname':'clientname','t-age':'age','t-netmonthly':'netmonthly','t-netmonthlyhint':'netmonthlyhint',
+    't-expenses':'expenses','t-yearsdep':'yearsdep','t-yearsdephint':'yearsdephint','t-avgdrawn':'avgdrawn','t-avgdrawnhint':'avgdrawnhint',
+    't-tabprotection':'tabprotection','t-tabaccumulation':'tabaccumulation','t-tabsummary':'tabsummary',
+    't-c1h':'c1h','t-dtpd10x':'dtpd10x','t-dtpdyears':'dtpdyears','t-existdtpd':'existdtpd',
+    't-c2h':'c2h','t-existci':'existci','t-existeci':'existeci','t-c2note':'c2note',
+    't-c3h':'c3h','t-existaccident':'existaccident','t-isp':'isp','t-c3note':'c3note',
+    't-c4h':'c4h','t-ltcdesired':'ltcdesired','t-ltcexist':'ltcexist','t-existip':'existip','t-c4note':'c4note',
+    't-ppyrh':'ppyrh','t-ppyrsub':'ppyrsub',
+    't-a1h':'a1h','t-a1note':'a1note','t-a2h':'a2h','t-a2sub':'a2sub','t-addgoal':'addgoal',
+    't-a3h':'a3h','t-roi':'roi','t-doubleyrs':'doubleyrs','t-apyrh':'apyrh','t-apyrsub':'apyrsub',
+    't-s1h':'s1h','t-thbenefit':'thbenefit','t-threq':'threq','t-thex':'thex','t-thshort':'thshort','t-thcov':'thcov','t-s1note':'s1note',
+    't-s2h':'s2h','t-thbucket':'thbucket','t-thmid':'thmid','t-thrange':'thrange','t-s3h':'s3h'
+  };
+  Object.keys(map).forEach(function(id){ const el = $(id); if (el) el.textContent = s[map[id]]; });
+  $('avgDrawnIncome').placeholder = s.avgdrawn;
+  updateConfidential();
+}
+
+function updateConfidential(){
+  const s = L();
+  const name = $('clientName').value.trim();
+  $('confidentialNotice').textContent = name ? s.confidentialNamed(name) : s.confidentialGeneric;
+}
+
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(x){ x.classList.remove('active'); });
+    document.querySelectorAll('.panel').forEach(function(x){ x.classList.remove('active'); });
+    t.classList.add('active');
+    $('panel-' + t.dataset.tab).classList.add('active');
+  });
+});
+
+let goalIdSeq = 1;
+let goals = [{ id: goalIdSeq++, name: '', amount: 100000, years: 20 }];
+
+function goalRowHTML(g, i, s){
+  return '<div class="field compact"><label>'+(i===0? s.goalName : '')+'</label><input data-id="'+g.id+'" data-k="name" value="'+g.name+'" placeholder="'+s.goalPlaceholder+'"></div>'+
+    '<div class="field compact"><label>'+(i===0? s.goalTarget : '')+'</label><input data-id="'+g.id+'" data-k="amount" type="number" value="'+g.amount+'"></div>'+
+    '<div class="field compact"><label>'+(i===0? s.goalYears : '')+'</label><input data-id="'+g.id+'" data-k="years" type="number" value="'+g.years+'"></div>'+
+    '<div class="field compact"><label>'+(i===0? s.goalPerMonth : '')+'</label><input id="goalpm-'+g.id+'" value="'+money(g.years>0? g.amount/(g.years*12):0)+'" disabled style="color:var(--brass);font-weight:700;"></div>'+
+    '<button class="rmv" title="remove" data-rm="'+g.id+'">✕</button>';
+}
+
+function renderGoals(){
+  const s = L();
+  const wrap = $('goalRows');
+  wrap.innerHTML = '';
+  goals.forEach(function(g, i){
+    const row = document.createElement('div');
+    row.className = 'goalrow';
+    row.dataset.id = g.id;
+    row.innerHTML = goalRowHTML(g, i, s);
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll('input[data-id]').forEach(function(inp){
+    inp.addEventListener('input', function(e){
+      const id = +e.target.dataset.id, k = e.target.dataset.k;
+      const g = goals.find(function(x){ return x.id === id; });
+      if (!g) return;
+      g[k] = (k === 'name') ? e.target.value : num(e.target.value);
+      const pm = $('goalpm-' + id);
+      if (pm) pm.value = money(g.years > 0 ? g.amount / (g.years * 12) : 0);
+      calcAll();
+    });
+  });
+  wrap.querySelectorAll('button[data-rm]').forEach(function(b){
+    b.addEventListener('click', function(e){
+      goals = goals.filter(function(g){ return g.id !== +e.target.dataset.rm; });
+      renderGoals();
+      calcAll();
+    });
+  });
+}
+$('addGoalBtn').addEventListener('click', function(){
+  goals.push({ id: goalIdSeq++, name: '', amount: 0, years: 10 });
+  renderGoals();
+});
+
+function buildPyramid(container, sections, colors){
+  const n = sections.length;
+  const vw = 300, vh = 264, apexY = 8, baseY = 258, cx = 150, baseHalf = 138;
+  let svg = '<svg class="pyramid-svg" viewBox="0 0 '+vw+' '+vh+'" xmlns="http://www.w3.org/2000/svg">';
+  sections.forEach(function(sec, idx){
+    const hTop = idx / n, hBot = (idx + 1) / n;
+    const yTop = apexY + (baseY - apexY) * hTop, yBot = apexY + (baseY - apexY) * hBot;
+    const wTop = baseHalf * hTop, wBot = baseHalf * hBot;
+    const pts = (cx-wTop)+','+yTop+' '+(cx+wTop)+','+yTop+' '+(cx+wBot)+','+yBot+' '+(cx-wBot)+','+yBot;
+    svg += '<polygon points="'+pts+'" fill="'+colors[idx % colors.length]+'" />';
+  });
+  for (let k = 1; k < n; k++){
+    const h = k / n, w = baseHalf * h, y = apexY + (baseY - apexY) * h;
+    svg += '<line x1="'+(cx-w)+'" y1="'+y+'" x2="'+(cx+w)+'" y2="'+y+'" stroke="#F7F5F0" stroke-width="2"/>';
+  }
+  svg += '</svg>';
+
+  let legend = '<div class="pyramid-legend">';
+  sections.forEach(function(sec, idx){
+    legend += '<div class="legend-item">'+
+      '<div class="legend-dot" style="background:'+colors[idx % colors.length]+'"></div>'+
+      '<div class="legend-text">'+
+        '<div class="l-label">'+sec.label+'</div>'+
+        '<div class="l-value">'+sec.sub+'</div>'+
+        (sec.flag ? '<div class="l-flag" style="color:'+(sec.flagColor||'#3F6B4F')+'">'+sec.flag+'</div>' : '')+
+      '</div>'+
+    '</div>';
+  });
+  legend += '</div>';
+
+  container.innerHTML = '<div class="pyramid-flex">'+svg+legend+'</div>';
+}
+
+const STORAGE_KEY = 'famg_pyramid_clients_v1';
+function getSavedClients(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){ return {}; } }
+function setSavedClients(obj){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); return true; } catch(e){ return false; } }
+function refreshClientSelect(){
+  const sel = $('savedClientSelect');
+  const clients = getSavedClients();
+  const current = sel.value;
+  sel.innerHTML = '<option value="">'+L().selectopt+'</option>';
+  Object.keys(clients).sort().forEach(function(name){
+    const o = document.createElement('option'); o.value = name; o.textContent = name; sel.appendChild(o);
+  });
+  if (clients[current]) sel.value = current;
+}
+const FORM_IDS = ['clientName','clientAge','netMonthly','monthlyExpenses','yearsDependent','avgDrawnIncome',
+  'existDeathTPD','existCI','existECI','existAccident','ltcMonthly','existLTC','existIP','rule72roi'];
+function serializeState(){
+  const state = {};
+  FORM_IDS.forEach(function(id){ const el = $(id); if (el) state[id] = el.value; });
+  state.hasISP = $('hasISP').checked;
+  state.dtpdMethod = document.querySelector('input[name="dtpdMethod"]:checked').value;
+  state.goals = goals;
+  return state;
+}
+function loadState(state){
+  FORM_IDS.forEach(function(id){ const el = $(id); if (el && state[id] !== undefined) el.value = state[id]; });
+  $('hasISP').checked = !!state.hasISP;
+  const r = document.querySelector('input[name="dtpdMethod"][value="'+(state.dtpdMethod || '10x')+'"]');
+  if (r) r.checked = true;
+  goals = (state.goals && state.goals.length) ? state.goals.map(function(g){ return Object.assign({}, g, { id: goalIdSeq++ }); }) : goals;
+  renderGoals();
+  calcAll();
+}
+function showStatus(text){ const el = $('clientStatus'); el.textContent = text; setTimeout(function(){ if (el.textContent === text) el.textContent = ''; }, 2500); }
+
+$('saveClientBtn').addEventListener('click', function(){
+  const name = $('clientName').value.trim();
+  if (!name){ alert(L().alertName); return; }
+  const clients = getSavedClients();
+  clients[name] = serializeState();
+  setSavedClients(clients);
+  refreshClientSelect();
+  $('savedClientSelect').value = name;
+  showStatus(L().statusSaved);
+});
+$('loadClientBtn').addEventListener('click', function(){
+  const name = $('savedClientSelect').value;
+  if (!name){ alert(L().alertSelect); return; }
+  const clients = getSavedClients();
+  if (clients[name]) { loadState(clients[name]); showStatus(L().statusLoaded); }
+});
+$('deleteClientBtn').addEventListener('click', function(){
+  const name = $('savedClientSelect').value;
+  if (!name){ alert(L().alertSelect); return; }
+  if (!confirm(L().confirmDelete(name))) return;
+  const clients = getSavedClients();
+  delete clients[name];
+  setSavedClients(clients);
+  refreshClientSelect();
+  showStatus(L().statusDeleted);
+});
+
+$('langBtn').addEventListener('click', function(){
+  lang = lang === 'en' ? 'zh' : 'en';
+  applyStaticText();
+  renderGoals();
+  refreshClientSelect();
+  calcAll();
+});
+
+function calcAll(){
+  const s = L();
+  updateConfidential();
+  const NM = num($('netMonthly').value);
+  const NI = NM * 12;
+  const expenses = num($('monthlyExpenses').value);
+  const yearsDep = num($('yearsDependent').value);
+  const avgDrawn = num($('avgDrawnIncome').value) || NM;
+
+  const dtpdMethod = document.querySelector('input[name="dtpdMethod"]:checked').value;
+  const dtpd10x = 10 * NI;
+  const dtpdYears = yearsDep * NI;
+  const dtpdRequired = dtpdMethod === '10x' ? dtpd10x : dtpdYears;
+  const existDeathTPD = num($('existDeathTPD').value);
+
+  const accidentRequired = clamp0(1000000 - dtpdRequired);
+  const existAccident = num($('existAccident').value);
+
+  const ciRequired = 150000 + 5 * NI;
+  const existCI = num($('existCI').value);
+  const eciRequired = Math.max(150000, 0.25 * ciRequired);
+  const existECI = num($('existECI').value);
+
+  const ltcMonthly = num($('ltcMonthly').value);
+  const ltcLump = 3 * ltcMonthly;
+  const existLTC = num($('existLTC').value);
+
+  const ipRequired = 0.75 * avgDrawn;
+  const existIP = num($('existIP').value);
+
+  const hasISP = $('hasISP').checked;
+
+  const pb = s.bandsProtection;
+  const sections = [
+    { label: pb[0].l, sub: pb[0].r + ' — ' + money(dtpdRequired) },
+    { label: pb[1].l, sub: pb[1].r + ' — ' + money(ciRequired) },
+    { label: pb[2].l, sub: pb[2].r + ' — ' + money(eciRequired) },
+    { label: pb[3].l, sub: pb[3].r + ' — ' + money(accidentRequired) },
+    { label: pb[4].l, sub: pb[4].r, flag: hasISP ? '✓' : '✕', flagColor: hasISP ? '#3F6B4F' : '#A44A3F' },
+    { label: pb[5].l, sub: money(ltcMonthly)+'/mo · '+money(ltcLump)+' lump' },
+    { label: pb[6].l, sub: pb[6].r + ' — ' + money(ipRequired)+'/mo' }
+  ];
+  buildPyramid($('protectionPyramid'), sections, BAND_COLORS_P);
+
+  const budgetLow = NM*0.10, budgetMid = NM*0.15, budgetHigh = NM*0.20;
+  const expenseLimit = NM*0.40;
+  const expenseFlag = expenses > expenseLimit
+    ? '<span class="flagwarn">'+s.expOver(money(expenses-expenseLimit))+'</span>'
+    : '<span class="flagok">'+s.expOk+'</span>';
+  $('protectionBudgetNote').innerHTML = s.budgetNote(money(budgetLow), money(budgetHigh), money(budgetMid))+'<br>'+expenseFlag+'<br>'+(dtpdMethod==='10x' ? s.altYears(money(dtpdYears)) : s.alt10x(money(dtpd10x)));
+
+  const ab = s.bandsAccumulation;
+  const midLow = NM*0.20, midMid = NM*0.25, midHigh = NM*0.30;
+  const longLow = NM*0.15, longMid = NM*0.20, longHigh = NM*0.25;
+  const efLow = expenses*3, efHigh = expenses*6;
+  const accSections = [
+    { label: ab[0].l, sub: ab[0].r },
+    { label: ab[1].l, sub: money(longLow)+' – '+money(longHigh)+'/mo' },
+    { label: ab[2].l, sub: money(midLow)+' – '+money(midHigh)+'/mo' },
+    { label: ab[3].l, sub: money(efLow)+' – '+money(efHigh)+' total' }
+  ];
+  buildPyramid($('accumulationPyramid'), accSections, BAND_COLORS_A);
+
+  const roi = num($('rule72roi').value);
+  $('rule72out').textContent = roi > 0 ? (72/roi).toFixed(1) + (lang==='zh' ? ' 年' : ' years') : '—';
+
+  const rows = [
+    [s.rowDeathTPD, dtpdRequired, existDeathTPD, 'DeathTPD'],
+    [s.rowCI, ciRequired, existCI, 'CI'],
+    [s.rowECI, eciRequired, existECI, 'ECI'],
+    [s.rowAccident, accidentRequired, existAccident, 'Accident'],
+    [s.rowIP, ipRequired, existIP, 'IP'],
+    [s.rowLTC, ltcMonthly, existLTC, 'LTC']
+  ];
+  const tbody = document.querySelector('#shortfallTable tbody');
+  tbody.innerHTML = '';
+  const gaps = [];
+  rows.forEach(function(row, idx){
+    const label = row[0], req = row[1], ex = row[2], key = row[3];
+    const short = clamp0(req - ex);
+    const pct = req > 0 ? Math.min(100, (ex/req)*100) : 100;
+    if (short > 0) gaps.push({ label: label, short: short, isMonthly: idx >= 4, key: key });
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+label+'</td><td>'+money(req)+'</td><td>'+money(ex)+'</td>'+
+      '<td class="'+(short>0?'shortfall-neg':'shortfall-ok')+'">'+(short>0? money(short)+(idx>=4?'/mo':'') : s.fullyfunded)+'</td>'+
+      '<td class="barcell"><div class="bartrack"><div class="barfill" style="width:'+pct+'%"></div></div></td>';
+    tbody.appendChild(tr);
+  });
+
+  const cta = $('ctaBanner');
+  // Fixed priority order (not sorted by dollar size): CI, Early CI, Income Protection, Accident, then Death/TPD, LTC.
+  const PRIORITY_KEYS = ['CI','ECI','IP','Accident','DeathTPD','LTC'];
+  const gapsByKey = {};
+  gaps.forEach(function(g){ gapsByKey[g.key] = g; });
+  const orderedGaps = PRIORITY_KEYS.map(function(k){ return gapsByKey[k]; }).filter(Boolean);
+  if (orderedGaps.length){
+    const items = orderedGaps.map(function(g, i){
+      const amt = money(g.short) + (g.isMonthly ? '/mo' : '');
+      return '<li><span class="rank">'+(i+1)+'.</span> <b>'+g.label+'</b> — '+amt+'</li>';
+    }).join('');
+    cta.className = 'cta danger';
+    cta.innerHTML = '<div class="icon">⚠</div><div class="txt"><div class="main">'+s.ctaHeader(orderedGaps.length)+'</div><div class="sub">'+s.ctaDangerSub+'</div><ol class="ctalist">'+items+'</ol></div>';
+  } else {
+    cta.className = 'cta ok';
+    cta.innerHTML = '<div class="icon">✓</div><div class="txt"><div class="main">'+s.ctaOk+'</div><div class="sub">'+s.ctaOkSub+'</div></div>';
+  }
+
+  const cfBody = document.querySelector('#cashflowTable tbody');
+  cfBody.innerHTML = '';
+  const cfRows = [
+    [s.cfExpenses, expenses, '≤ '+money(expenseLimit)],
+    [s.cfProtection, budgetMid, money(budgetLow)+' – '+money(budgetHigh)],
+    [s.cfMid, midMid, money(midLow)+' – '+money(midHigh)],
+    [s.cfLong, longMid, money(longLow)+' – '+money(longHigh)]
+  ];
+  cfRows.forEach(function(row){
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+row[0]+'</td><td>'+money(row[1])+'</td><td>'+row[2]+'</td>';
+    cfBody.appendChild(tr);
+  });
+  const allocatedMid = expenses + budgetMid + midMid + longMid;
+  const remainder = NM - allocatedMid;
+  $('cashflowNote').innerHTML = NM>0
+    ? s.cfNote(money(NM), money(allocatedMid), money(remainder), remainder<0)
+    : s.cfNoneNote;
+
+  const monthlyGoalNeed = goals.reduce(function(sum,g){ return sum + (g.years>0? g.amount/(g.years*12):0); }, 0);
+  const capacity = midMid + longMid;
+  $('goalCapacityNote').innerHTML = capacity>0
+    ? s.goalNote(money(monthlyGoalNeed), money(capacity), monthlyGoalNeed>capacity, monthlyGoalNeed>capacity? money(monthlyGoalNeed-capacity) : money(capacity-monthlyGoalNeed))
+    : s.goalNoneNote;
+}
+
+document.querySelectorAll('.clientbar input, .card input').forEach(function(el){
+  el.addEventListener('input', function(){ calcAll(); });
+  el.addEventListener('change', function(){ calcAll(); });
+});
+document.querySelectorAll('input[name="dtpdMethod"]').forEach(function(r){ r.addEventListener('change', function(){ calcAll(); }); });
+$('hasISP').addEventListener('change', function(){ calcAll(); });
+
+$('resetBtn').addEventListener('click', function(){
+  if (!confirm(lang==='zh' ? '清除所有栏位以开始新客户？' : 'Clear all fields for a new client?')) return;
+  document.querySelectorAll('.clientbar input, .card input').forEach(function(el){ if (el.type!=='checkbox' && el.type!=='radio') el.value=''; else el.checked=false; });
+  document.querySelector('input[name="dtpdMethod"][value="10x"]').checked = true;
+  $('rule72roi').value = 5;
+  goals = [{ id: goalIdSeq++, name: '', amount: 100000, years: 20 }];
+  renderGoals();
+  calcAll();
+});
+$('printBtn').addEventListener('click', function(){ window.print(); });
+
+applyStaticText();
+renderGoals();
+refreshClientSelect();
+calcAll();
+</script>
+</body>
+</html>
