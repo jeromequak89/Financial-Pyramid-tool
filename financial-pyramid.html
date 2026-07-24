@@ -123,20 +123,27 @@
   .cta .ctalist li{color:#fff;font-size:13px;}
   .cta .ctalist .rank{opacity:.8;font-weight:600;margin-right:2px;}
 
+  thead{display:table-header-group;}
+
   @media print{
     @page{margin:0.55in;}
     .headeractions,.tabs,.toolbar{display:none !important;}
+    .no-print{display:none !important;}
     body{background:#fff;}
     .app{max-width:100%;padding:0;}
     .panel{display:block !important;}
     /* Each tab's content starts on its own page, so the PDF reads Protection / Accumulation / Summary in clean blocks */
     #panel-accumulation,#panel-summary{page-break-before:always;break-before:page;}
-    /* Never let a card, table, or row split across a page boundary mid-content */
-    .card,.pyramidwrap,.cta,.tablewrap,table.sum,tr,.goalrow,.pyramid-flex,.company-group{
-      page-break-inside:avoid;break-inside:avoid;
-    }
+    /* Small, fixed-height units must not split mid-content. Tables/company-groups are intentionally
+       excluded here — forcing "avoid" on something taller than one page just makes the renderer
+       ignore it and cut wherever, which is what caused the earlier cut-off pages. Letting them break
+       naturally between rows (with repeating headers, see thead rule above) prints far more cleanly. */
+    .card,.pyramidwrap,.cta{page-break-inside:avoid;break-inside:avoid;}
+    tr,.goalrow,.company-group,.legend-item{page-break-inside:avoid;break-inside:avoid;}
     .layout{display:block !important;}
     .layout .visual{margin-top:16px;}
+    .pyramid-flex{display:block !important;}
+    .pyramid-svg{display:block;margin:0 auto 14px;}
     a.card{box-shadow:none;}
   }
 
@@ -218,20 +225,25 @@
         </div>
 
         <div class="card">
-          <h3><span class="n">3</span><span id="t-c3h">Accident &amp; Hospitalisation</span></h3>
+          <h3><span class="n">3</span><span id="t-c3h">Accident</span></h3>
           <div class="notebox" id="t-c3note">Accident cover tops up Death/TPD to a combined $1,000,000.</div>
         </div>
 
         <div class="card">
-          <h3><span class="n">4</span><span id="t-c4h">Long-Term Care &amp; Income Protection</span></h3>
+          <h3><span class="n">4</span><span id="t-c3bh">Hospitalisation</span></h3>
+          <div class="notebox" id="t-c3bnote">Qualitative cover, not a dollar amount — add a policy below and set its Benefit Type to Hospitalisation to flag Integrated Shield Plan + Rider coverage on the pyramid.</div>
+        </div>
+
+        <div class="card">
+          <h3><span class="n">5</span><span id="t-c4h">Long-Term Care &amp; Income Protection</span></h3>
           <div class="row">
             <div class="field compact"><label id="t-ltcdesired">Desired LTC monthly payout</label><input id="ltcMonthly" type="number" placeholder="0"></div>
           </div>
           <div class="notebox" id="t-c4note">Income Protection required = 75% of average monthly drawn income. LTC lump-sum reserve = 3× desired monthly payout, for 2/3-of-6-ADL failure.</div>
         </div>
 
-        <div class="card">
-          <h3><span class="n">5</span><span id="t-c5h">Existing Protection Policies</span></h3>
+        <div class="card no-print">
+          <h3><span class="n">6</span><span id="t-c5h">Existing Protection Policies</span></h3>
           <p style="font-size:12px;color:var(--slate);margin:0 0 10px;" id="t-c5sub">Every policy the client already holds — this list drives the Existing column on the Summary tab and becomes the client's policy summary.</p>
           <div id="protPolicyRows"></div>
           <button class="addgoal" id="addProtPolicyBtn">+ <span id="t-addpolicy">Add policy</span></button>
@@ -275,7 +287,7 @@
           </div>
         </div>
 
-        <div class="card">
+        <div class="card no-print">
           <h3><span class="n">4</span><span id="t-a4h">Existing Accumulation Policies</span></h3>
           <p style="font-size:12px;color:var(--slate);margin:0 0 10px;" id="t-a4sub">Endowments, ILPs, unit trusts, or other savings/investment plans already in force.</p>
           <div id="accPolicyRows"></div>
@@ -346,7 +358,7 @@ en: {
   c1h:"Death & TPD", dtpd10x:"×10 annual income", dtpdyears:"Years to dependent-independence", existdtpd:"Existing Death/TPD coverage",
   c2h:"Critical & Early Critical Illness", existci:"Existing CI coverage", existeci:"Existing ECI coverage",
   c2note:"CI required = $150,000 + 5× annual income. ECI required = higher of $150,000 or 25% of CI required.",
-  c3h:"Accident & Hospitalisation", existaccident:"Existing accident coverage",
+  c3h:"Accident", c3bh:"Hospitalisation", c3bnote:"Qualitative cover, not a dollar amount — add a policy below and set its Benefit Type to Hospitalisation to flag Integrated Shield Plan + Rider coverage on the pyramid.",
   isp:"Has Integrated Shield Plan + Rider",
   c3note:"Accident cover tops up Death/TPD to a combined $1,000,000.",
   c4h:"Long-Term Care & Income Protection", ltcdesired:"Desired LTC monthly payout", ltcexist:"Existing LTC monthly payout",
@@ -415,7 +427,7 @@ zh: {
   c1h:"身故与全残保障", dtpd10x:"年收入的10倍", dtpdyears:"至受抚养人经济独立的年数", existdtpd:"现有身故/全残保额",
   c2h:"重大疾病与早期重疾", existci:"现有重疾保额", existeci:"现有早期重疾保额",
   c2note:"所需重疾保额 = $150,000 + 年收入 × 5。所需早期重疾保额 = $150,000 与重疾保额25%中的较高者。",
-  c3h:"意外与住院保障", existaccident:"现有意外保额",
+  c3h:"意外", c3bh:"住院", c3bnote:"定性保障，非金额指标——请在下方添加保单，并将其保障类型设为「住院」，以在金字塔上标示已投保综合健保双全计划及附加险。",
   isp:"已投保综合健保双全计划及附加险",
   c3note:"意外保障用于将身故/全残保额补足至合计$1,000,000。",
   c4h:"长期护理与收入保障", ltcdesired:"期望的长期护理每月赔付", ltcexist:"现有长期护理每月赔付",
@@ -491,7 +503,7 @@ function applyStaticText(){
     't-tabprotection':'tabprotection','t-tabaccumulation':'tabaccumulation','t-tabsummary':'tabsummary',
     't-c1h':'c1h','t-dtpd10x':'dtpd10x','t-dtpdyears':'dtpdyears',
     't-c2h':'c2h','t-c2note':'c2note',
-    't-c3h':'c3h','t-c3note':'c3note',
+    't-c3h':'c3h','t-c3note':'c3note','t-c3bh':'c3bh','t-c3bnote':'c3bnote',
     't-c4h':'c4h','t-ltcdesired':'ltcdesired','t-c4note':'c4note',
     't-c5h':'c5h','t-c5sub':'c5sub','t-addpolicy':'addpolicy',
     't-ppyrh':'ppyrh','t-ppyrsub':'ppyrsub',
