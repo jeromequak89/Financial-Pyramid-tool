@@ -95,9 +95,13 @@
   table.sum.sub th{border-bottom:1px solid var(--line);}
 
   .goalrow{display:grid;grid-template-columns:1.4fr .8fr .6fr .9fr auto;gap:8px;align-items:end;margin-bottom:10px;}
-  .goalrow.policyrow{grid-template-columns:1.1fr 1.2fr 1fr 1.1fr .8fr auto;}
-  .goalrow.policyrow-acc{grid-template-columns:1.1fr 1.3fr 1fr .9fr auto;}
-  .policyrow select{width:100%;border:none;border-bottom:1.5px solid var(--line);background:transparent;padding:6px 2px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--navy-deep);font-weight:600;outline:none;}
+  .policycard{position:relative;border:1px solid var(--line);border-radius:6px;padding:16px 44px 14px 16px;margin-bottom:12px;background:#FCFBF8;}
+  .policycard .prow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  .policycard .prow.prow2{grid-template-columns:1fr 1fr;margin-top:10px;}
+  .policycard .prow.prow2acc{grid-template-columns:1fr;margin-top:10px;max-width:260px;}
+  .policycard .rmv{position:absolute;top:10px;right:10px;font-size:16px;}
+  .policycard select{width:100%;border:none;border-bottom:1.5px solid var(--line);background:transparent;padding:6px 2px;font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--navy-deep);font-weight:600;outline:none;}
+  .policycard input.company-other{width:100%;border:none;border-bottom:1.5px solid var(--brass-light);background:transparent;padding:6px 2px;font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--navy-deep);font-weight:600;outline:none;}
   .goalrow input{width:100%;}
   .rmv{background:none;border:none;color:var(--rust);cursor:pointer;font-size:16px;padding:4px;}
   .addgoal{font-family:inherit;font-weight:600;font-size:12px;color:var(--brass);background:none;border:1px dashed var(--brass-light);border-radius:4px;padding:7px 14px;cursor:pointer;margin-top:4px;}
@@ -153,7 +157,7 @@
     .brandblock h1{font-size:26px;}
     .card,.pyramidwrap,.clientbar,.toolbar{padding:16px;}
     .goalrow{grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:6px;padding:10px 10px 14px;gap:8px;position:relative;}
-    .goalrow.policyrow,.goalrow.policyrow-acc{grid-template-columns:1fr 1fr;}
+    .policycard .prow,.policycard .prow.prow2{grid-template-columns:1fr;}
     .goalrow > :first-child{grid-column:1/-1;}
     .goalrow input{min-height:38px;}
     .rmv{position:absolute;top:6px;right:8px;font-size:18px;padding:6px;}
@@ -365,7 +369,8 @@ en: {
   existip:"Existing income protection (monthly)",
   c4note:"Income Protection required = 75% of average monthly drawn income. LTC lump-sum reserve = 3× desired monthly payout, for 2/3-of-6-ADL failure.",
   c5h:"Existing Protection Policies", c5sub:"Every policy the client already holds — this list drives the Existing column on the Summary tab and becomes the client's policy summary.",
-  addpolicy:"Add policy", polCompany:"Company", polName:"Policy Name", polNumber:"Policy No.", polType:"Benefit Type", polAmount:"Amount", polAmountHint:"lump sum, or /mo for Income Protection & LTC", polPlaceholderName:"e.g. PRUShield", polPlaceholderCompany:"e.g. Prudential",
+  addpolicy:"Add policy", polCompany:"Company", polName:"Policy Name", polNumber:"Policy No.", polType:"Benefit Type", polSumAssured:"Sum Assured", polPlaceholderName:"e.g. PRUShield",
+  polSelectCompany:"— Select company —", polOther:"Other", polOtherPlaceholder:"Enter company name",
   typeDeathTPD:"Death & TPD", typeCI:"Critical Illness", typeECI:"Early CI", typeAccident:"Accident", typeHosp:"Hospitalisation", typeLTC:"Long-Term Care (/mo)", typeIP:"Income Protection (/mo)",
   ppyrh:"Wealth Protection Pyramid", ppyrsub:"Required coverage, calculated live from client inputs",
   a1h:"Emergency Fund", a1note:"Target = 3 to 6 months of monthly expenses. Uses the expenses figure entered above.",
@@ -434,7 +439,8 @@ zh: {
   existip:"现有收入保障（每月）",
   c4note:"所需收入保障 = 平均每月提取收入的75%。长期护理一次性储备 = 期望每月赔付的3倍，适用于6项日常生活能力中2/3项丧失的情况。",
   c5h:"现有保障保单", c5sub:"客户目前持有的每一份保单——此列表将用于总结页的「现有」栏位，并生成客户的保单总览。",
-  addpolicy:"添加保单", polCompany:"保险公司", polName:"保单名称", polNumber:"保单号码", polType:"保障类型", polAmount:"保额", polAmountHint:"一次性保额，收入保障与长期护理为每月金额", polPlaceholderName:"例如：PRUShield", polPlaceholderCompany:"例如：保诚",
+  addpolicy:"添加保单", polCompany:"保险公司", polName:"保单名称", polNumber:"保单号码", polType:"保障类型", polSumAssured:"保额", polPlaceholderName:"例如：PRUShield",
+  polSelectCompany:"— 请选择保险公司 —", polOther:"其他", polOtherPlaceholder:"请输入保险公司名称",
   typeDeathTPD:"身故与全残", typeCI:"重大疾病", typeECI:"早期重疾", typeAccident:"意外", typeHosp:"住院", typeLTC:"长期护理（每月）", typeIP:"收入保障（每月）",
   ppyrh:"财富保障金字塔", ppyrsub:"所需保额，根据客户资料实时计算",
   a1h:"紧急备用金", a1note:"目标 = 每月支出的3至6倍，依据上方填写的支出金额计算。",
@@ -585,47 +591,69 @@ let policyIdSeq = 1;
 let protPolicies = [];
 let accPolicies = [];
 
+const COMPANIES = ['Prudential','AIA','Great Eastern','Singlife','NTUC','Manulife','Tokio Marine','HSBC','FWD'];
 const PROT_TYPES = ['DeathTPD','CI','ECI','Accident','Hospitalisation','LTC','IP'];
 function typeLabel(s, key){
   return { DeathTPD:s.typeDeathTPD, CI:s.typeCI, ECI:s.typeECI, Accident:s.typeAccident, Hospitalisation:s.typeHosp, LTC:s.typeLTC, IP:s.typeIP }[key];
 }
+function companySelectHTML(p, s){
+  const isOther = p.company && COMPANIES.indexOf(p.company) === -1;
+  let opts = '<option value=""'+(!p.company?' selected':'')+'>'+s.polSelectCompany+'</option>';
+  opts += COMPANIES.map(function(c){ return '<option value="'+c+'"'+(p.company===c?' selected':'')+'>'+c+'</option>'; }).join('');
+  opts += '<option value="__other__"'+(isOther?' selected':'')+'>'+s.polOther+'</option>';
+  return '<select data-id="'+p.id+'" data-k="companySelect">'+opts+'</select>'+
+    '<input data-id="'+p.id+'" data-k="companyOther" class="company-other" style="display:'+(isOther?'block':'none')+';margin-top:6px;" value="'+(isOther?p.company:'')+'" placeholder="'+s.polOtherPlaceholder+'">';
+}
 
 function protPolicyRowHTML(p, i, s){
-  const opts = PROT_TYPES.map(function(k){ return '<option value="'+k+'"'+(p.type===k?' selected':'')+'>'+typeLabel(s,k)+'</option>'; }).join('');
-  return '<div class="field compact"><label>'+(i===0? s.polCompany : '')+'</label><input data-id="'+p.id+'" data-k="company" value="'+p.company+'" placeholder="'+s.polPlaceholderCompany+'"></div>'+
-    '<div class="field compact"><label>'+(i===0? s.polName : '')+'</label><input data-id="'+p.id+'" data-k="name" value="'+p.name+'" placeholder="'+s.polPlaceholderName+'"></div>'+
-    '<div class="field compact"><label>'+(i===0? s.polNumber : '')+'</label><input data-id="'+p.id+'" data-k="number" value="'+p.number+'"></div>'+
-    '<div class="field compact"><label>'+(i===0? s.polType : '')+'</label><select data-id="'+p.id+'" data-k="type">'+opts+'</select></div>'+
-    '<div class="field compact"><label>'+(i===0? s.polAmount : '')+'</label><input data-id="'+p.id+'" data-k="amount" type="number" value="'+p.amount+'"></div>'+
-    '<button class="rmv" title="remove" data-rm="'+p.id+'">✕</button>';
+  const typeOpts = PROT_TYPES.map(function(k){ return '<option value="'+k+'"'+(p.type===k?' selected':'')+'>'+typeLabel(s,k)+'</option>'; }).join('');
+  return '<button class="rmv" title="remove" data-rm="'+p.id+'">✕</button>'+
+    '<div class="prow"><div class="field compact"><label>'+s.polCompany+'</label>'+companySelectHTML(p, s)+'</div>'+
+    '<div class="field compact"><label>'+s.polName+'</label><input data-id="'+p.id+'" data-k="name" value="'+p.name+'" placeholder="'+s.polPlaceholderName+'"></div>'+
+    '<div class="field compact"><label>'+s.polNumber+'</label><input data-id="'+p.id+'" data-k="number" value="'+p.number+'"></div></div>'+
+    '<div class="prow prow2"><div class="field compact"><label>'+s.polType+'</label><select data-id="'+p.id+'" data-k="type">'+typeOpts+'</select></div>'+
+    '<div class="field compact"><label>'+s.polSumAssured+'</label><input data-id="'+p.id+'" data-k="amount" type="number" value="'+p.amount+'"></div></div>';
+}
+
+function wirePolicyRow(row, list){
+  row.querySelectorAll('[data-id]').forEach(function(inp){
+    const evt = inp.tagName === 'SELECT' ? 'change' : 'input';
+    inp.addEventListener(evt, function(e){
+      const id = +e.target.dataset.id, k = e.target.dataset.k;
+      const p = list.find(function(x){ return x.id === id; });
+      if (!p) return;
+      if (k === 'companySelect'){
+        const otherInput = row.querySelector('[data-k="companyOther"]');
+        if (e.target.value === '__other__'){
+          otherInput.style.display = 'block';
+          p.company = otherInput.value;
+          otherInput.focus();
+        } else {
+          otherInput.style.display = 'none';
+          otherInput.value = '';
+          p.company = e.target.value;
+        }
+      } else if (k === 'companyOther'){
+        p.company = e.target.value;
+      } else {
+        p[k] = (k === 'amount' || k === 'value') ? num(e.target.value) : e.target.value;
+      }
+      calcAll();
+    });
+  });
 }
 
 function renderProtPolicies(){
   const s = L();
   const wrap = $('protPolicyRows');
   wrap.innerHTML = '';
-  protPolicies.forEach(function(p, i){
+  protPolicies.forEach(function(p){
     const row = document.createElement('div');
-    row.className = 'goalrow policyrow';
+    row.className = 'policycard';
     row.dataset.id = p.id;
-    row.innerHTML = protPolicyRowHTML(p, i, s);
+    row.innerHTML = protPolicyRowHTML(p, 0, s);
     wrap.appendChild(row);
-  });
-  wrap.querySelectorAll('[data-id]').forEach(function(inp){
-    inp.addEventListener('input', function(e){
-      const id = +e.target.dataset.id, k = e.target.dataset.k;
-      const p = protPolicies.find(function(x){ return x.id === id; });
-      if (!p) return;
-      p[k] = (k === 'amount') ? num(e.target.value) : e.target.value;
-      calcAll();
-    });
-    inp.addEventListener('change', function(e){
-      const id = +e.target.dataset.id, k = e.target.dataset.k;
-      const p = protPolicies.find(function(x){ return x.id === id; });
-      if (!p) return;
-      p[k] = (k === 'amount') ? num(e.target.value) : e.target.value;
-      calcAll();
-    });
+    wirePolicyRow(row, protPolicies);
   });
   wrap.querySelectorAll('button[data-rm]').forEach(function(b){
     b.addEventListener('click', function(e){
@@ -641,32 +669,24 @@ $('addProtPolicyBtn').addEventListener('click', function(){
 });
 
 function accPolicyRowHTML(p, i, s){
-  return '<div class="field compact"><label>'+(i===0? s.polCompany : '')+'</label><input data-id="'+p.id+'" data-k="company" value="'+p.company+'" placeholder="'+s.polPlaceholderCompany+'"></div>'+
-    '<div class="field compact"><label>'+(i===0? s.polName : '')+'</label><input data-id="'+p.id+'" data-k="name" value="'+p.name+'" placeholder="'+s.polPlaceholderNameAcc+'"></div>'+
-    '<div class="field compact"><label>'+(i===0? s.polNumber : '')+'</label><input data-id="'+p.id+'" data-k="number" value="'+p.number+'"></div>'+
-    '<div class="field compact"><label>'+(i===0? s.polValue : '')+'</label><input data-id="'+p.id+'" data-k="value" type="number" value="'+p.value+'"></div>'+
-    '<button class="rmv" title="remove" data-rm="'+p.id+'">✕</button>';
+  return '<button class="rmv" title="remove" data-rm="'+p.id+'">✕</button>'+
+    '<div class="prow"><div class="field compact"><label>'+s.polCompany+'</label>'+companySelectHTML(p, s)+'</div>'+
+    '<div class="field compact"><label>'+s.polName+'</label><input data-id="'+p.id+'" data-k="name" value="'+p.name+'" placeholder="'+s.polPlaceholderNameAcc+'"></div>'+
+    '<div class="field compact"><label>'+s.polNumber+'</label><input data-id="'+p.id+'" data-k="number" value="'+p.number+'"></div></div>'+
+    '<div class="prow prow2acc"><div class="field compact"><label>'+s.polValue+'</label><input data-id="'+p.id+'" data-k="value" type="number" value="'+p.value+'"></div></div>';
 }
 
 function renderAccPolicies(){
   const s = L();
   const wrap = $('accPolicyRows');
   wrap.innerHTML = '';
-  accPolicies.forEach(function(p, i){
+  accPolicies.forEach(function(p){
     const row = document.createElement('div');
-    row.className = 'goalrow policyrow policyrow-acc';
+    row.className = 'policycard';
     row.dataset.id = p.id;
-    row.innerHTML = accPolicyRowHTML(p, i, s);
+    row.innerHTML = accPolicyRowHTML(p, 0, s);
     wrap.appendChild(row);
-  });
-  wrap.querySelectorAll('[data-id]').forEach(function(inp){
-    inp.addEventListener('input', function(e){
-      const id = +e.target.dataset.id, k = e.target.dataset.k;
-      const p = accPolicies.find(function(x){ return x.id === id; });
-      if (!p) return;
-      p[k] = (k === 'value') ? num(e.target.value) : e.target.value;
-      calcAll();
-    });
+    wirePolicyRow(row, accPolicies);
   });
   wrap.querySelectorAll('button[data-rm]').forEach(function(b){
     b.addEventListener('click', function(e){
