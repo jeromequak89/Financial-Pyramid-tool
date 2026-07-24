@@ -1015,7 +1015,7 @@
 
     .age-row-filter {
       display: grid;
-      grid-template-columns: minmax(180px, 0.75fr) minmax(220px, 1.25fr);
+      grid-template-columns: minmax(150px, 0.6fr) minmax(160px, 0.9fr) minmax(150px, 0.6fr) minmax(160px, 0.9fr);
       gap: 14px;
       align-items: center;
       margin: 0 0 12px;
@@ -1493,6 +1493,13 @@
     .mode-btn.active {
       background: var(--ink);
       color: #ffffff;
+    }
+
+    .mode-btn.home-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border-right: 1px solid var(--line-ref);
     }
 
     .action-row {
@@ -1994,6 +2001,38 @@
         background: #ffffff;
       }
     }
+
+    .topbar{display:flex;justify-content:flex-end;align-items:center;gap:12px;width:min(1180px,100%);margin:0 auto 10px;padding:14px 0 0;}
+    .topbar .signedin{font-size:11px;color:var(--muted-ref);font-family:var(--mono);}
+    .topbar button{background:transparent;border:1.5px solid var(--primary-ref);color:var(--primary-ref);font-family:var(--sans);font-weight:600;font-size:12px;padding:7px 14px;border-radius:var(--radius);cursor:pointer;}
+    .topbar button:hover{background:var(--primary-ref);color:#fff;}
+
+    .authwrap{position:fixed;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999;}
+    .authcard{background:var(--surface);border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,0.35);padding:36px 34px;width:100%;max-width:360px;text-align:center;}
+    .authlogo{height:52px;width:auto;margin-bottom:14px;}
+    .autheyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ref);margin:0 0 4px;}
+    .authtitle{font-family:var(--serif);font-size:22px;margin:0 0 8px;color:var(--ink);}
+    .authsub{font-size:12.5px;color:var(--muted-ref);margin:0 0 22px;line-height:1.5;}
+    .authcard .afield{text-align:left;margin-bottom:16px;}
+    .authcard .afield label{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-ref);margin-bottom:5px;font-weight:600;}
+    .authcard .afield input{width:100%;border:1.5px solid var(--line-ref);border-radius:var(--radius);padding:10px 10px;font-family:var(--sans);font-size:16px;color:var(--ink);outline:none;box-sizing:border-box;}
+    .authcard .afield input:focus{border-color:var(--gold-ref);}
+    .authbtn{width:100%;padding:12px;font-size:13.5px;margin-top:4px;background:var(--primary-ref);border:1.5px solid var(--primary-ref);color:#fff;font-family:var(--sans);font-weight:600;border-radius:var(--radius);cursor:pointer;}
+    .authbtn:hover{background:var(--primary-light-ref);}
+    .authbtn:disabled{opacity:.6;cursor:not-allowed;}
+    .autherror{color:var(--danger-ref);font-size:12px;margin:10px 0 0;min-height:16px;font-weight:600;}
+    .authfooter{font-size:11px;color:var(--muted-ref);margin:20px 0 0;line-height:1.5;}
+
+    .db-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding:10px 12px;border:1px solid var(--line-ref);border-radius:var(--radius);background:#fbfaf6;}
+    .db-toolbar-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-ref);font-weight:700;margin-right:2px;}
+    .db-toolbar select{height:34px;padding:5px 9px;border:1px solid var(--line-ref);border-radius:var(--radius);background:#fff;color:var(--ink);font-family:var(--sans);font-size:11.5px;min-width:160px;}
+    .db-toolbar button{min-height:34px;padding:7px 12px;border:1px solid var(--line-ref);border-radius:var(--radius);background:#fff;color:var(--primary-ref);font-family:var(--sans);font-size:11.5px;font-weight:700;cursor:pointer;}
+    .db-toolbar button:hover{border-color:var(--primary-ref);background:var(--primary-wash-ref);}
+    .db-toolbar .db-save-btn{background:var(--primary-ref);color:#fff;border-color:var(--primary-ref);}
+    .db-toolbar .db-save-btn:hover{background:var(--primary-light-ref);}
+    .db-status{font-size:11px;color:var(--primary-ref);font-weight:700;min-width:70px;}
+
+    @media print { .topbar,.db-toolbar,#authScreen{display:none !important;} }
 
 
     /* ================================================================
@@ -2688,6 +2727,26 @@
   </style>
 </head>
 <body>
+
+<div id="authScreen" class="authwrap">
+  <div class="authcard">
+    <img class="authlogo" id="authLogoImg" alt="Financial Architects Advisory">
+    <p class="autheyebrow">Financial Architects Advisory</p>
+    <h2 class="authtitle">Agent Tools</h2>
+    <p class="authsub">Sign in with the account your team lead set up for you.</p>
+    <div class="afield"><label>Email</label><input id="authEmail" type="email" autocomplete="username"></div>
+    <div class="afield"><label>Password</label><input id="authPassword" type="password" autocomplete="current-password"></div>
+    <div id="authError" class="autherror"></div>
+    <button class="authbtn" id="authSignInBtn">Sign In</button>
+    <p class="authfooter">No account? Ask your team lead to create one for you in Supabase.</p>
+  </div>
+</div>
+
+<div id="mainApp" style="display:none;">
+<div class="topbar">
+  <span class="signedin" id="signedInAs"></span>
+  <button id="logoutBtn">Log out</button>
+</div>
   <main class="page">
     <div class="draft-banner" id="draftBanner" hidden>
       <span id="draftBannerText">An auto-saved draft was found in this browser.</span>
@@ -2717,6 +2776,7 @@
 
       <div class="head-actions">
         <div class="mode-toggle language-toggle" aria-label="Language">
+          <a href="index.html" class="mode-btn home-link">← Back to Tools</a>
           <button class="mode-btn active" id="langEnglishButton" type="button" data-lang="en">EN</button>
           <button class="mode-btn" id="langChineseButton" type="button" data-lang="zh">中文</button>
         </div>
@@ -2821,6 +2881,15 @@
             <label for="headerClientAge" data-i18n="lbl_clientage">Client age</label>
             <input id="headerClientAge" type="text" value="35" readonly />
           </div>
+        </div>
+
+        <div class="db-toolbar">
+          <span class="db-toolbar-label">Saved clients (database)</span>
+          <select id="savedProjectionSelect"><option value="">— select —</option></select>
+          <button type="button" id="loadProjectionBtn">Load</button>
+          <button type="button" id="deleteProjectionBtn">Delete</button>
+          <button type="button" class="db-save-btn" id="saveProjectionBtn">Save this client</button>
+          <span class="db-status" id="dbStatus"></span>
         </div>
       </div>
     </header>
@@ -3161,6 +3230,17 @@
           </div>
 
           <div class="age-row-filter">
+            <label for="yearRowFilter">
+              Show Years
+              <span>Leave blank to show all rows. Use commas for multiple years.</span>
+            </label>
+            <input
+              id="yearRowFilter"
+              type="text"
+              inputmode="numeric"
+              placeholder="Example: 1,2,3"
+              autocomplete="off"
+            />
             <label for="ageRowFilter">
               Show Ages
               <span>Leave blank to show all rows. Use commas for multiple ages.</span>
@@ -3210,7 +3290,9 @@
       </div>
     </div>
   </main>
+</div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     (() => {
       "use strict";
@@ -3307,7 +3389,7 @@
     "Combine": "组合",
     "Select Tabs": "选择标签",
     "Tabs Selected": "个标签已选择",
-    "Entry Method": "项目方式", "Year-by-Year Projection": "逐年预测", "Detailed annual roll-forward from the entered age through age 120.": "从当前年龄至120岁的逐年明细。", "Show Ages": "显示年龄", "Leave blank to show all rows. Use commas for multiple ages.": "留空显示所有行；多个年龄请用逗号分隔。", "Table Columns": "表格栏位", "Client Report Centre": "客户报告中心", "Client Details & Downloads": "客户资料与下载", "Enter the client’s details, tick one or more projections, then download the selected reports or the full set.": "输入客户资料，勾选一个或多个预测，再下载所选报告或完整报告。", "Client Details": "客户资料", "Client Name": "客户姓名", "Used in downloaded report filenames": "用于下载报告的文件名", "Prepared By": "顾问", "Shown on the PDF report": "显示在PDF报告中", "Birthday": "出生日期", "Current age will be calculated automatically": "系统将自动计算当前年龄", "Calculated Current Age": "计算后的当前年龄", "Automatically copied to Projection Inputs": "自动复制至预测输入", "Enter a birthday to calculate and populate the current age.": "请输入出生日期以计算并填入当前年龄。", "Choose Projections to Download": "选择要下载的预测", "Select All": "全选", "Clear All": "全部清除", "Growth projection and payout results": "增长预测与派发结果", "Flex projection and payout results": "灵活预测与派发结果", "Additional investments, units, and payout results": "额外投资、单位数与派发结果", "Death benefit and assurance charge results": "身故保障与保障费用结果", "Download Selected Excel": "下载所选Excel", "Download Selected PDF": "下载所选PDF", "Download All Projections": "下载全部预测", "Download All Excel": "下载全部Excel", "Download All PDF": "下载全部PDF", "Additional Investment Projection": "额外投资预测", "Total Value Invested": "总投资价值", "Year-by-Year Additional Investment Account": "额外投资账户逐年预测", "Scheduled additional investments, units, and dividends through age 120.": "显示至120岁的额外投资、单位数与股息。", "Death Benefit Projection": "身故保障预测", "Accumulated Contribution": "累计供款", "Death Benefit": "身故保障", "Year-by-Year Sum Assured": "保额逐年预测", "Total Additional Investment": "额外投资总额", "Total 3% Charge": "3%费用总额", "Final Value Invested": "最终投资价值", "Total Payout": "累计派发", "Investment Entries": "投资项目数", "Final Death Benefit": "最终身故保障", "Final Death Benefit %": "最终身故保障百分比", "Current Sum-at-Risk": "当前风险保额", "Current Yearly Assurance Charge": "当前年度保障费用", "Contribution Years": "供款年数", "Projection End Age": "预测结束年龄", "Age 120": "120岁", "Year": "年份", "Age": "年龄", "Contribution": "供款", "Welcome Bonus": "迎新奖励", "0.5% Addition": "0.5%额外增值", "Account Amount": "账户金额", "Admin Charge": "管理费", "Yearly Assurance Charge": "年度保障费用", "Value Invested": "投资价值", "Units": "单位数", "Monthly Dividend": "每月股息", "Yearly Dividend": "年度股息", "New Units": "新增单位", "Total Units": "总单位数", "Payout": "派发", "Annual Contribution": "年度供款", "Death Benefit %": "身故保障百分比", "Sum-at-Risk": "风险保额", "Summary": "摘要", "Applied Export Filters": "已应用的导出筛选", "Projection Graph": "预测图表", "Ages": "年龄", "Table columns": "表格栏位", "Graph series": "图表项目", "All ages": "所有年龄", "Client Profile": "客户资料", "Generated On": "生成日期", "Monthly Dividend Per Unit": "每单位每月股息", "Method": "方式", "Total Assurance Charges": "保障费用总额", "Total Dividend Generated": "累计股息总额", "Additional Investment": "额外投资", "Projection": "预测", "No rows match the selected age filter.": "没有符合所选年龄筛选的行。", "All table columns are hidden by the current filter.": "当前筛选已隐藏所有表格栏位。", "All graph series are hidden.": "当前筛选已隐藏所有图表项目。", "Please enter a valid birthday that is not in the future.": "请输入有效且不晚于今天的出生日期。", "All projections selected.": "已选择全部预测。", "Projection selection cleared.": "已清除预测选择。", "Report prepared successfully.": "报告已准备完成。", "Confidential": "机密文件", "Prepared for": "服务对象", "Date": "日期", "Page": "第", "of": "页，共", "Investment Projection Report": "投资预测报告", "Financial Projection Report": "财务预测报告", "Mastering Your Blueprint of Wealth": "掌握您的财富蓝图"};
+    "Entry Method": "项目方式", "Year-by-Year Projection": "逐年预测", "Detailed annual roll-forward from the entered age through age 120.": "从当前年龄至120岁的逐年明细。", "Show Ages": "显示年龄", "Leave blank to show all rows. Use commas for multiple ages.": "留空显示所有行；多个年龄请用逗号分隔。", "Show Years": "显示年份", "Leave blank to show all rows. Use commas for multiple years.": "留空显示所有行；多个年份请用逗号分隔。", "Years": "年份", "All years": "所有年份", "← Back to Tools": "← 返回工具首页", "Table Columns": "表格栏位", "Client Report Centre": "客户报告中心", "Client Details & Downloads": "客户资料与下载", "Enter the client’s details, tick one or more projections, then download the selected reports or the full set.": "输入客户资料，勾选一个或多个预测，再下载所选报告或完整报告。", "Client Details": "客户资料", "Client Name": "客户姓名", "Used in downloaded report filenames": "用于下载报告的文件名", "Prepared By": "顾问", "Shown on the PDF report": "显示在PDF报告中", "Birthday": "出生日期", "Current age will be calculated automatically": "系统将自动计算当前年龄", "Calculated Current Age": "计算后的当前年龄", "Automatically copied to Projection Inputs": "自动复制至预测输入", "Enter a birthday to calculate and populate the current age.": "请输入出生日期以计算并填入当前年龄。", "Choose Projections to Download": "选择要下载的预测", "Select All": "全选", "Clear All": "全部清除", "Growth projection and payout results": "增长预测与派发结果", "Flex projection and payout results": "灵活预测与派发结果", "Additional investments, units, and payout results": "额外投资、单位数与派发结果", "Death benefit and assurance charge results": "身故保障与保障费用结果", "Download Selected Excel": "下载所选Excel", "Download Selected PDF": "下载所选PDF", "Download All Projections": "下载全部预测", "Download All Excel": "下载全部Excel", "Download All PDF": "下载全部PDF", "Additional Investment Projection": "额外投资预测", "Total Value Invested": "总投资价值", "Year-by-Year Additional Investment Account": "额外投资账户逐年预测", "Scheduled additional investments, units, and dividends through age 120.": "显示至120岁的额外投资、单位数与股息。", "Death Benefit Projection": "身故保障预测", "Accumulated Contribution": "累计供款", "Death Benefit": "身故保障", "Year-by-Year Sum Assured": "保额逐年预测", "Total Additional Investment": "额外投资总额", "Total 3% Charge": "3%费用总额", "Final Value Invested": "最终投资价值", "Total Payout": "累计派发", "Investment Entries": "投资项目数", "Final Death Benefit": "最终身故保障", "Final Death Benefit %": "最终身故保障百分比", "Current Sum-at-Risk": "当前风险保额", "Current Yearly Assurance Charge": "当前年度保障费用", "Contribution Years": "供款年数", "Projection End Age": "预测结束年龄", "Age 120": "120岁", "Year": "年份", "Age": "年龄", "Contribution": "供款", "Welcome Bonus": "迎新奖励", "0.5% Addition": "0.5%额外增值", "Account Amount": "账户金额", "Admin Charge": "管理费", "Yearly Assurance Charge": "年度保障费用", "Value Invested": "投资价值", "Units": "单位数", "Monthly Dividend": "每月股息", "Yearly Dividend": "年度股息", "New Units": "新增单位", "Total Units": "总单位数", "Payout": "派发", "Annual Contribution": "年度供款", "Death Benefit %": "身故保障百分比", "Sum-at-Risk": "风险保额", "Summary": "摘要", "Applied Export Filters": "已应用的导出筛选", "Projection Graph": "预测图表", "Ages": "年龄", "Table columns": "表格栏位", "Graph series": "图表项目", "All ages": "所有年龄", "Client Profile": "客户资料", "Generated On": "生成日期", "Monthly Dividend Per Unit": "每单位每月股息", "Method": "方式", "Total Assurance Charges": "保障费用总额", "Total Dividend Generated": "累计股息总额", "Additional Investment": "额外投资", "Projection": "预测", "No rows match the selected age filter.": "没有符合所选年龄筛选的行。", "All table columns are hidden by the current filter.": "当前筛选已隐藏所有表格栏位。", "All graph series are hidden.": "当前筛选已隐藏所有图表项目。", "Please enter a valid birthday that is not in the future.": "请输入有效且不晚于今天的出生日期。", "All projections selected.": "已选择全部预测。", "Projection selection cleared.": "已清除预测选择。", "Report prepared successfully.": "报告已准备完成。", "Confidential": "机密文件", "Prepared for": "服务对象", "Date": "日期", "Page": "第", "of": "页，共", "Investment Projection Report": "投资预测报告", "Financial Projection Report": "财务预测报告", "Mastering Your Blueprint of Wealth": "掌握您的财富蓝图"};
       const textLanguageState = new WeakMap();
       const placeholderLanguageState = new WeakMap();
 
@@ -3472,7 +3554,8 @@
         fundPrice: 0.97,
         dividendPayout: 0.0051,
         dividendPayoutYear: 0,
-        ageRowFilter: ""
+        ageRowFilter: "",
+        yearRowFilter: ""
       };
 
       let activeMode = MODES.GROWTH;
@@ -3629,6 +3712,7 @@
         tableTitle: $("tableTitle"),
         tableDescription: $("tableDescription"),
         ageRowFilter: $("ageRowFilter"),
+        yearRowFilter: $("yearRowFilter"),
         columnSelector: $("columnSelector"),
         showAllColumnsButton: $("showAllColumnsButton"),
         projectionHead: $("projectionHead"),
@@ -4112,10 +4196,16 @@
       function applyReportTableFilters(report) {
         const visibility = getColumnVisibilityState(report.mode);
         const requestedAges = getRequestedAges();
+        const requestedYears = getRequestedYears();
+        const hasFilter = requestedAges !== null || requestedYears !== null;
 
-        const filteredRows = requestedAges === null
+        const filteredRows = !hasFilter
           ? report.rows
-          : report.rows.filter((row) => requestedAges.has(row.age));
+          : report.rows.filter((row) => {
+              const ageMatch = requestedAges !== null && requestedAges.has(row.age);
+              const yearMatch = requestedYears !== null && requestedYears.has(row.year);
+              return ageMatch || yearMatch;
+            });
 
         const filteredColumns = report.columns.filter((column) => {
           const visibilityKey =
@@ -4134,6 +4224,12 @@
               requestedAges === null
                 ? "All ages"
                 : [...requestedAges]
+                    .sort((a, b) => a - b)
+                    .join(", "),
+            years:
+              requestedYears === null
+                ? "All years"
+                : [...requestedYears]
                     .sort((a, b) => a - b)
                     .join(", "),
             visibleColumns: filteredColumns.length,
@@ -4731,8 +4827,8 @@
 
         rows[16] = ["Applied Export Filters"];
         rows[17] = [
-          "Ages",
-          report.exportFilterDetails?.ages || "All ages"
+          "Ages / Years",
+          `${report.exportFilterDetails?.ages || "All ages"} / ${report.exportFilterDetails?.years || "All years"}`
         ];
         rows[18] = [
           "Visible Table Columns",
@@ -5390,6 +5486,7 @@
 
             const filters = report.exportFilterDetails || {
               ages: T("All ages", "所有年龄"),
+              years: T("All years", "所有年份"),
               visibleColumns: report.columns.length,
               totalColumns: report.columns.length,
               visibleGraphSeries: 0,
@@ -5424,6 +5521,7 @@
                   </div>
 
                   <div class="rp-filter-summary">
+                    <span><b>${T("Years", "年份")}:</b> ${escapeHtml(filters.years || T("All years", "所有年份"))}</span>
                     <span><b>${T("Ages", "年龄")}:</b> ${escapeHtml(filters.ages)}</span>
                     <span>
                       <b>${T("Table columns", "表格栏位")}:</b>
@@ -5492,8 +5590,7 @@
     }
     .report-page {
       min-height:185mm;
-      display:flex;
-      flex-direction:column;
+      display:block;
       page-break-after:always;
     }
     .report-page:last-child { page-break-after:auto; }
@@ -5528,14 +5625,14 @@
       letter-spacing:.12em;
       text-transform:uppercase;
     }
-    .rp-body { flex:1; }
     .rp-footer {
       display:flex;
       align-items:center;
       justify-content:space-between;
-      margin-top:auto;
+      margin-top:16px;
       padding-top:10px;
       border-top:1px solid var(--line);
+      page-break-inside:avoid;
     }
     .rp-footer img { height:14px; width:auto; opacity:.75; }
     .rp-fname { color:var(--muted); font-family:var(--serif); font-size:10px; }
@@ -5642,12 +5739,14 @@
       border:1px solid var(--line);
       background:#FBFAF6;
       color:var(--muted);
+      page-break-inside:avoid;
     }
     .rp-two-col {
       display:grid;
       grid-template-columns:1fr 1.6fr;
       gap:14px;
       margin-bottom:9px;
+      page-break-inside:avoid;
     }
     h3 {
       margin:9px 0 6px;
@@ -5808,10 +5907,10 @@
     @page { size:A4 landscape; margin:11mm; }
     * { box-sizing:border-box; }
     body { margin:0; color:var(--ink); font-family:var(--sans); font-size:9px; }
-    .page { min-height:185mm; display:flex; flex-direction:column; }
+    .page { min-height:185mm; display:block; }
     header,footer { display:flex; align-items:center; justify-content:space-between; }
     header { padding-bottom:9px; border-bottom:1px solid var(--line); }
-    footer { margin-top:auto; padding-top:8px; border-top:1px solid var(--line); color:var(--muted); }
+    footer { margin-top:16px; padding-top:8px; border-top:1px solid var(--line); color:var(--muted); page-break-inside:avoid; }
     .brand { display:flex; align-items:center; gap:9px; }
     .brand img { height:24px; }
     .brand span { color:var(--muted); font-family:var(--mono); letter-spacing:.13em; text-transform:uppercase; }
@@ -5820,7 +5919,7 @@
     .subtitle { margin-bottom:12px; color:var(--muted); }
     .meta { display:flex; gap:18px; margin-bottom:12px; color:var(--muted); }
     .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-    .op-card { display:flex; gap:12px; align-items:center; min-height:125px; padding:10px 12px; border:1px solid var(--line); }
+    .op-card { display:flex; gap:12px; align-items:center; min-height:125px; padding:10px 12px; border:1px solid var(--line); page-break-inside:avoid; }
     .op-card-main { flex:1; min-width:0; }
     .op-eyebrow { color:var(--gold); font-family:var(--mono); font-size:8px; letter-spacing:.1em; }
     h2 { margin:2px 0 8px; font-family:var(--serif); font-size:15px; }
@@ -6015,7 +6114,8 @@
             years: elements.years.value,
             fundPrice: elements.fundPrice.value,
             dividendPayout: elements.dividendPayout.value,
-            ageRowFilter: elements.ageRowFilter.value
+            ageRowFilter: elements.ageRowFilter.value,
+            yearRowFilter: elements.yearRowFilter.value
           },
           payoutYearByMode: {
             [MODES.GROWTH]: payoutYearByMode[MODES.GROWTH] || 0,
@@ -6080,6 +6180,7 @@
           elements.dividendPayout.value = inputs.dividendPayout;
         }
         elements.ageRowFilter.value = inputs.ageRowFilter || "";
+        elements.yearRowFilter.value = inputs.yearRowFilter || "";
 
         payoutYearByMode[MODES.GROWTH] =
           Number(data.payoutYearByMode?.[MODES.GROWTH]) || 0;
@@ -7490,10 +7591,28 @@
         return new Set(values);
       }
 
+      function getRequestedYears() {
+        const raw = elements.yearRowFilter.value.trim();
+        if (!raw) return null;
+
+        const values = raw
+          .split(",")
+          .map((value) => value.trim())
+          .filter((value) => /^\d+$/.test(value))
+          .map((value) => Number.parseInt(value, 10));
+
+        return new Set(values);
+      }
+
       function filterRowsByAge(rows) {
         const requestedAges = getRequestedAges();
-        if (requestedAges === null) return rows;
-        return rows.filter((row) => requestedAges.has(row.age));
+        const requestedYears = getRequestedYears();
+        if (requestedAges === null && requestedYears === null) return rows;
+        return rows.filter((row) => {
+          const ageMatch = requestedAges !== null && requestedAges.has(row.age);
+          const yearMatch = requestedYears !== null && requestedYears.has(row.year);
+          return ageMatch || yearMatch;
+        });
       }
 
       function renderNoMatchingRows(columnCount) {
@@ -8678,6 +8797,7 @@
         elements.workspace.classList.remove("results-expanded");
         updateViewControlLabels();
         elements.ageRowFilter.value = defaults.ageRowFilter;
+        elements.yearRowFilter.value = defaults.yearRowFilter;
 
         additionalMethod = "combine";
         additionalEntries = [];
@@ -8722,6 +8842,7 @@
       });
 
       elements.ageRowFilter.addEventListener("input", refreshCurrentTable);
+      elements.yearRowFilter.addEventListener("input", refreshCurrentTable);
 
       elements.methodReinvestButton.addEventListener(
         "click",
@@ -8985,6 +9106,142 @@
       update();
       applyLanguage();
       checkForDraft();
+
+      /* ---------------- Supabase auth gate ---------------- */
+      const SUPABASE_URL = "https://ygbtbhyvpworrmuezsrf.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYnRiaHl2cHdvcnJtdWV6c3JmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4ODQ2ODAsImV4cCI6MjEwMDQ2MDY4MH0.sSDhdcUPvSqDkaKakUHJSjEszVAaibEYwGqiDPh6Tc8";
+      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const g = (id) => document.getElementById(id);
+
+      if (g("authLogoImg")) g("authLogoImg").src = LOGO_FULL;
+
+      async function showApp() {
+        g("authScreen").style.display = "none";
+        g("mainApp").style.display = "block";
+        const { data: { user } } = await sb.auth.getUser();
+        g("signedInAs").textContent = user ? user.email : "";
+        await refreshSavedProjectionSelect();
+      }
+      function showAuthScreen() {
+        g("authScreen").style.display = "flex";
+        g("mainApp").style.display = "none";
+      }
+      async function checkSession() {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) { showApp(); } else { showAuthScreen(); }
+      }
+      g("authSignInBtn").addEventListener("click", async () => {
+        const email = g("authEmail").value.trim();
+        const password = g("authPassword").value;
+        g("authError").textContent = "";
+        if (!email || !password) { g("authError").textContent = "Enter both email and password."; return; }
+        const btn = g("authSignInBtn");
+        btn.disabled = true; btn.textContent = "Signing in…";
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        btn.disabled = false; btn.textContent = "Sign In";
+        if (error) { g("authError").textContent = error.message; return; }
+        showApp();
+      });
+      g("authPassword").addEventListener("keydown", (e) => { if (e.key === "Enter") g("authSignInBtn").click(); });
+      g("logoutBtn").addEventListener("click", async () => {
+        await sb.auth.signOut();
+        showAuthScreen();
+      });
+
+      /* ---------------- Database save/load (Supabase, replaces browser-only client files) ---------------- */
+      let currentProjectionId = null;
+
+      async function refreshSavedProjectionSelect() {
+        const sel = g("savedProjectionSelect");
+        if (!sel) return;
+        const current = sel.value;
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) return;
+        const { data } = await sb
+          .from("investment_projections")
+          .select("id,name")
+          .eq("user_id", user.id)
+          .order("name");
+        sel.innerHTML = '<option value="">— select —</option>';
+        (data || []).forEach((row) => {
+          const o = document.createElement("option");
+          o.value = row.id;
+          o.textContent = row.name || "(unnamed)";
+          sel.appendChild(o);
+        });
+        if (data && data.some((row) => row.id === current)) sel.value = current;
+      }
+
+      function dbStatus(text) {
+        const el = g("dbStatus");
+        if (!el) return;
+        el.textContent = text;
+        window.setTimeout(() => { if (el.textContent === text) el.textContent = ""; }, 2500);
+      }
+
+      async function saveProjectionToDb() {
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) return;
+        const name = elements.clientName.value.trim();
+        if (!name) { alert("Enter a client name first."); return; }
+
+        const payload = {
+          user_id: user.id,
+          name,
+          data: collectClientFileData(),
+          updated_at: new Date().toISOString()
+        };
+
+        if (currentProjectionId) {
+          const { error } = await sb.from("investment_projections").update(payload).eq("id", currentProjectionId);
+          if (error) { alert("Save failed: " + error.message); return; }
+        } else {
+          const { data, error } = await sb.from("investment_projections").insert(payload).select().single();
+          if (error) { alert("Save failed: " + error.message); return; }
+          currentProjectionId = data.id;
+        }
+
+        await refreshSavedProjectionSelect();
+        g("savedProjectionSelect").value = currentProjectionId;
+        dbStatus("Saved ✓");
+      }
+
+      async function loadProjectionFromDb(id) {
+        const { data: row, error } = await sb.from("investment_projections").select("*").eq("id", id).single();
+        if (error || !row) { alert("Load failed: " + (error ? error.message : "not found")); return; }
+        currentProjectionId = row.id;
+        applyClientFileData(row.data);
+        dbStatus("Loaded ✓");
+      }
+
+      async function deleteProjectionFromDb(id) {
+        await sb.from("investment_projections").delete().eq("id", id);
+        if (currentProjectionId === id) currentProjectionId = null;
+        await refreshSavedProjectionSelect();
+        dbStatus("Deleted");
+      }
+
+      if (g("saveProjectionBtn")) {
+        g("saveProjectionBtn").addEventListener("click", saveProjectionToDb);
+      }
+      if (g("loadProjectionBtn")) {
+        g("loadProjectionBtn").addEventListener("click", async () => {
+          const id = g("savedProjectionSelect").value;
+          if (!id) { alert("Select a saved client to load."); return; }
+          await loadProjectionFromDb(id);
+        });
+      }
+      if (g("deleteProjectionBtn")) {
+        g("deleteProjectionBtn").addEventListener("click", async () => {
+          const id = g("savedProjectionSelect").value;
+          if (!id) { alert("Select a saved client to load."); return; }
+          const label = g("savedProjectionSelect").options[g("savedProjectionSelect").selectedIndex].textContent;
+          if (!confirm(`Delete saved client "${label}"?`)) return;
+          await deleteProjectionFromDb(id);
+        });
+      }
+
+      checkSession();
     })();
   </script>
 
