@@ -27,6 +27,8 @@
   .confidential{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;color:var(--slate);text-align:center;padding:6px 0 18px;border-bottom:1px solid var(--line);margin-bottom:16px;}
   .confidential b{color:var(--rust);}
   button.ghost{background:transparent;border:1.5px solid var(--navy);color:var(--navy);font-family:inherit;font-weight:600;font-size:12.5px;padding:9px 14px;border-radius:3px;cursor:pointer;letter-spacing:.02em;}
+  a.homebtn{background:transparent;border:1.5px solid var(--navy);color:var(--navy);font-family:inherit;font-weight:600;font-size:12.5px;padding:9px 14px;border-radius:3px;letter-spacing:.02em;text-decoration:none;display:inline-flex;align-items:center;}
+  a.homebtn:hover{background:var(--navy);color:var(--white);}
   button.ghost:hover{background:var(--navy);color:var(--white);}
   button.solid{background:var(--navy);border:1.5px solid var(--navy);color:var(--white);font-family:inherit;font-weight:600;font-size:12.5px;padding:9px 14px;border-radius:3px;cursor:pointer;}
   button.solid:hover{background:var(--navy-deep);}
@@ -118,6 +120,13 @@
   .policycard .rmv{position:absolute;top:10px;right:10px;font-size:16px;}
   .policycard select{width:100%;border:none;border-bottom:1.5px solid var(--line);background:transparent;padding:6px 2px;font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--navy-deep);font-weight:600;outline:none;}
   .policycard input.company-other{width:100%;border:none;border-bottom:1.5px solid var(--brass-light);background:transparent;padding:6px 2px;font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--navy-deep);font-weight:600;outline:none;}
+  .policycard .prow.prow4{grid-template-columns:1fr 1fr 1fr .8fr;}
+  .policycard .prow.prow4acc{grid-template-columns:1fr 1fr 1fr;}
+  .benefitlist{margin-top:10px;display:flex;flex-direction:column;gap:8px;}
+  .benefitrow{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;background:#F3EFE6;border-radius:4px;padding:8px 10px;}
+  .rmv-benefit{background:none;border:none;color:var(--rust);cursor:pointer;font-size:13px;padding:4px;align-self:center;}
+  .addbenefit{font-family:inherit;font-weight:600;font-size:11.5px;color:var(--brass);background:none;border:1px dashed var(--brass-light);border-radius:4px;padding:6px 12px;cursor:pointer;margin-top:10px;}
+  .addbenefit:hover{background:#FBF6EE;}
   .goalrow input{width:100%;}
   .rmv{background:none;border:none;color:var(--rust);cursor:pointer;font-size:16px;padding:4px;}
   .addgoal{font-family:inherit;font-weight:600;font-size:12px;color:var(--brass);background:none;border:1px dashed var(--brass-light);border-radius:4px;padding:7px 14px;cursor:pointer;margin-top:4px;}
@@ -173,7 +182,8 @@
     .brandblock h1{font-size:26px;}
     .card,.pyramidwrap,.clientbar,.toolbar{padding:16px;}
     .goalrow{grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:6px;padding:10px 10px 14px;gap:8px;position:relative;}
-    .policycard .prow,.policycard .prow.prow2{grid-template-columns:1fr;}
+    .policycard .prow,.policycard .prow.prow2,.policycard .prow.prow4,.policycard .prow.prow4acc{grid-template-columns:1fr;}
+    .benefitrow{grid-template-columns:1fr;}
     .goalrow > :first-child{grid-column:1/-1;}
     .goalrow input{min-height:38px;}
     .rmv{position:absolute;top:6px;right:8px;font-size:18px;padding:6px;}
@@ -211,6 +221,7 @@
       </div>
     </div>
     <div class="headeractions">
+      <a class="ghost homebtn" href="index.html" id="t-homebtn">← Back to Tools</a>
       <button class="ghost" id="langBtn">中文</button>
       <button class="ghost" id="logoutBtn">Log out</button>
       <button class="ghost" id="resetBtn">Reset</button>
@@ -383,7 +394,7 @@
 const STR = {
 en: {
   eyebrow:"Client Planning Worksheet", title:"Financial Pyramid", tagline:"\u201CWhat you cannot protect is not yours.\u201D",
-  reset:"Reset", print:"Print / Save PDF", langBtn:"中文",
+  reset:"Reset", print:"Print / Save PDF", langBtn:"中文", homebtn:"← Back to Tools",
   savedclients:"Saved clients", selectopt:"— select —", load:"Load", del:"Delete", save:"Save this client",
   statusSaved:"Saved ✓", statusLoaded:"Loaded ✓", statusDeleted:"Deleted", alertName:"Enter a client name first.",
   alertSelect:"Select a saved client to load.", confirmDelete:function(n){ return 'Delete saved client "'+n+'"?'; },
@@ -403,7 +414,7 @@ en: {
   existip:"Existing income protection (monthly)",
   c4note:"Income Protection required = 75% of average monthly drawn income. LTC lump-sum reserve = 3× desired monthly payout, for 2/3-of-6-ADL failure.",
   c5h:"Existing Protection Policies", c5sub:"Every policy the client already holds — this list drives the Existing column on the Summary tab and becomes the client's policy summary.",
-  addpolicy:"Add policy", polCompany:"Company", polName:"Policy Name", polNumber:"Policy No.", polType:"Benefit Type", polSumAssured:"Sum Assured", polPlaceholderName:"e.g. PRUShield",
+  addpolicy:"Add policy", polCompany:"Company", polName:"Policy Name", polNumber:"Policy No.", polType:"Benefit Type", polSumAssured:"Sum Assured", polPremium:"Annual Premium", polAddBenefit:"Add another benefit on this policy", polPlaceholderName:"e.g. PRUShield",
   polSelectCompany:"— Select company —", polOther:"Other", polOtherPlaceholder:"Enter company name",
   typeDeathTPD:"Death & TPD", typeCI:"Critical Illness", typeECI:"Early CI", typeAccident:"Accident", typeHosp:"Hospitalisation", typeLTC:"Long-Term Care (/mo)", typeIP:"Income Protection (/mo)",
   ppyrh:"Wealth Protection Pyramid", ppyrsub:"Required coverage, calculated live from client inputs",
@@ -420,7 +431,7 @@ en: {
   s3h:"Goal Savings vs Capacity",
   s4h:"Policy Summary", s4sub:"Every policy entered under Protection and Accumulation, grouped by company — the client's copy of what they hold today.",
   noCompany:"Company not specified", policyCount:function(n){ return n + (n===1 ? ' policy' : ' policies'); },
-  thcategory:"Category", thcompany:"Company", thpolicyname:"Policy Name", thpolicynum:"Policy No.", thamount:"Amount",
+  thcategory:"Category", thcompany:"Company", thpolicyname:"Policy Name", thpolicynum:"Policy No.", thamount:"Amount", thpremium:"Annual Premium",
   s4empty:"No policies entered yet — add them under the Protection and Accumulation tabs.", catProtection:"Protection", catAccumulation:"Accumulation",
   rowDeathTPD:"Death / TPD", rowCI:"Critical Illness", rowECI:"Early CI", rowAccident:"Accident (to $1M)",
   rowIP:"Income Protection (/mo)", rowLTC:"Long-Term Care (/mo)",
@@ -453,7 +464,7 @@ en: {
 },
 zh: {
   eyebrow:"客户规划工作表", title:"财务金字塔", tagline:"“无法保障的，就不属于你。”",
-  reset:"重置", print:"打印 / 保存PDF", langBtn:"EN",
+  reset:"重置", print:"打印 / 保存PDF", langBtn:"EN", homebtn:"← 返回工具首页",
   savedclients:"已保存客户", selectopt:"— 请选择 —", load:"载入", del:"删除", save:"保存此客户",
   statusSaved:"已保存 ✓", statusLoaded:"已载入 ✓", statusDeleted:"已删除", alertName:"请先填写客户姓名。",
   alertSelect:"请选择要载入的客户。", confirmDelete:function(n){ return '确定要删除已保存的客户「'+n+'」吗？'; },
@@ -473,7 +484,7 @@ zh: {
   existip:"现有收入保障（每月）",
   c4note:"所需收入保障 = 平均每月提取收入的75%。长期护理一次性储备 = 期望每月赔付的3倍，适用于6项日常生活能力中2/3项丧失的情况。",
   c5h:"现有保障保单", c5sub:"客户目前持有的每一份保单——此列表将用于总结页的「现有」栏位，并生成客户的保单总览。",
-  addpolicy:"添加保单", polCompany:"保险公司", polName:"保单名称", polNumber:"保单号码", polType:"保障类型", polSumAssured:"保额", polPlaceholderName:"例如：PRUShield",
+  addpolicy:"添加保单", polCompany:"保险公司", polName:"保单名称", polNumber:"保单号码", polType:"保障类型", polSumAssured:"保额", polPremium:"年缴保费", polAddBenefit:"在此保单下添加其他保障项目", polPlaceholderName:"例如：PRUShield",
   polSelectCompany:"— 请选择保险公司 —", polOther:"其他", polOtherPlaceholder:"请输入保险公司名称",
   typeDeathTPD:"身故与全残", typeCI:"重大疾病", typeECI:"早期重疾", typeAccident:"意外", typeHosp:"住院", typeLTC:"长期护理（每月）", typeIP:"收入保障（每月）",
   ppyrh:"财富保障金字塔", ppyrsub:"所需保额，根据客户资料实时计算",
@@ -490,7 +501,7 @@ zh: {
   s3h:"目标储蓄 vs 储蓄能力",
   s4h:"保单总览", s4sub:"客户在「财富保障」与「财富累积」下填写的所有保单，按保险公司分组——即客户可保留的保单总览。",
   noCompany:"未注明保险公司", policyCount:function(n){ return n + '份保单'; },
-  thcategory:"类别", thcompany:"保险公司", thpolicyname:"保单名称", thpolicynum:"保单号码", thamount:"金额",
+  thcategory:"类别", thcompany:"保险公司", thpolicyname:"保单名称", thpolicynum:"保单号码", thamount:"金额", thpremium:"年缴保费",
   s4empty:"尚未填写任何保单——请在「财富保障」与「财富累积」页签中添加。", catProtection:"保障", catAccumulation:"累积",
   rowDeathTPD:"身故 / 全残", rowCI:"重大疾病", rowECI:"早期重疾", rowAccident:"意外（补足至$1M）",
   rowIP:"收入保障（每月）", rowLTC:"长期护理（每月）",
@@ -536,7 +547,7 @@ const BAND_COLORS_A = ['#14213D','#2A3D67','#3A4F7E','#B0894F'];
 function applyStaticText(){
   const s = L();
   const map = {
-    't-eyebrow':'eyebrow','t-title':'title','t-tagline':'tagline','resetBtn':'reset','printBtn':'print','langBtn':'langBtn',
+    't-eyebrow':'eyebrow','t-title':'title','t-tagline':'tagline','resetBtn':'reset','printBtn':'print','langBtn':'langBtn','t-homebtn':'homebtn',
     't-savedclients':'savedclients','t-selectopt':'selectopt','loadClientBtn':'load','deleteClientBtn':'del','saveClientBtn':'save',
     't-clientname':'clientname','t-age':'age','t-netmonthly':'netmonthly','t-netmonthlyhint':'netmonthlyhint',
     't-expenses':'expenses','t-yearsdep':'yearsdep','t-yearsdephint':'yearsdephint','t-avgdrawn':'avgdrawn','t-avgdrawnhint':'avgdrawnhint',
@@ -622,6 +633,7 @@ $('addGoalBtn').addEventListener('click', function(){
 
 /* ---------------- Existing policy registers (Protection + Accumulation) ---------------- */
 let policyIdSeq = 1;
+let groupIdSeq = 1;
 let protPolicies = [];
 let accPolicies = [];
 
@@ -630,84 +642,129 @@ const PROT_TYPES = ['DeathTPD','CI','ECI','Accident','Hospitalisation','LTC','IP
 function typeLabel(s, key){
   return { DeathTPD:s.typeDeathTPD, CI:s.typeCI, ECI:s.typeECI, Accident:s.typeAccident, Hospitalisation:s.typeHosp, LTC:s.typeLTC, IP:s.typeIP }[key];
 }
-function companySelectHTML(p, s){
-  const isOther = p.company && COMPANIES.indexOf(p.company) === -1;
-  let opts = '<option value=""'+(!p.company?' selected':'')+'>'+s.polSelectCompany+'</option>';
-  opts += COMPANIES.map(function(c){ return '<option value="'+c+'"'+(p.company===c?' selected':'')+'>'+c+'</option>'; }).join('');
+function companySelectHTML(rowId, company, s){
+  const isOther = company && COMPANIES.indexOf(company) === -1;
+  let opts = '<option value=""'+(!company?' selected':'')+'>'+s.polSelectCompany+'</option>';
+  opts += COMPANIES.map(function(c){ return '<option value="'+c+'"'+(company===c?' selected':'')+'>'+c+'</option>'; }).join('');
   opts += '<option value="__other__"'+(isOther?' selected':'')+'>'+s.polOther+'</option>';
-  return '<select data-id="'+p.id+'" data-k="companySelect">'+opts+'</select>'+
-    '<input data-id="'+p.id+'" data-k="companyOther" class="company-other" style="display:'+(isOther?'block':'none')+';margin-top:6px;" value="'+(isOther?p.company:'')+'" placeholder="'+s.polOtherPlaceholder+'">';
+  return '<select data-gid="'+rowId+'" data-k="companySelect">'+opts+'</select>'+
+    '<input data-gid="'+rowId+'" data-k="companyOther" class="company-other" style="display:'+(isOther?'block':'none')+';margin-top:6px;" value="'+(isOther?company:'')+'" placeholder="'+s.polOtherPlaceholder+'">';
 }
 
-function protPolicyRowHTML(p, i, s){
-  const typeOpts = PROT_TYPES.map(function(k){ return '<option value="'+k+'"'+(p.type===k?' selected':'')+'>'+typeLabel(s,k)+'</option>'; }).join('');
-  return '<button class="rmv" title="remove" data-rm="'+p.id+'">✕</button>'+
-    '<div class="prow"><div class="field compact"><label>'+s.polCompany+'</label>'+companySelectHTML(p, s)+'</div>'+
-    '<div class="field compact"><label>'+s.polName+'</label><input data-id="'+p.id+'" data-k="name" value="'+p.name+'" placeholder="'+s.polPlaceholderName+'"></div>'+
-    '<div class="field compact"><label>'+s.polNumber+'</label><input data-id="'+p.id+'" data-k="number" value="'+p.number+'"></div></div>'+
-    '<div class="prow prow2"><div class="field compact"><label>'+s.polType+'</label><select data-id="'+p.id+'" data-k="type">'+typeOpts+'</select></div>'+
-    '<div class="field compact"><label>'+s.polSumAssured+'</label><input data-id="'+p.id+'" data-k="amount" type="number" value="'+p.amount+'"></div></div>';
-}
-
-function wirePolicyRow(row, list){
-  row.querySelectorAll('[data-id]').forEach(function(inp){
-    const evt = inp.tagName === 'SELECT' ? 'change' : 'input';
-    inp.addEventListener(evt, function(e){
-      const id = +e.target.dataset.id, k = e.target.dataset.k;
-      const p = list.find(function(x){ return x.id === id; });
-      if (!p) return;
-      if (k === 'companySelect'){
-        const otherInput = row.querySelector('[data-k="companyOther"]');
-        if (e.target.value === '__other__'){
-          otherInput.style.display = 'block';
-          p.company = otherInput.value;
-          otherInput.focus();
-        } else {
-          otherInput.style.display = 'none';
-          otherInput.value = '';
-          p.company = e.target.value;
-        }
-      } else if (k === 'companyOther'){
-        p.company = e.target.value;
-      } else {
-        p[k] = (k === 'amount' || k === 'value') ? num(e.target.value) : e.target.value;
-      }
-      calcAll();
-    });
+function groupBy(arr, key){
+  const map = new Map();
+  arr.forEach(function(item){
+    if (!map.has(item[key])) map.set(item[key], []);
+    map.get(item[key]).push(item);
   });
+  return map;
+}
+
+function protPolicyCardHTML(groupId, rows, s){
+  const first = rows[0];
+  const benefitRows = rows.map(function(p){
+    const typeOpts = PROT_TYPES.map(function(k){ return '<option value="'+k+'"'+(p.type===k?' selected':'')+'>'+typeLabel(s,k)+'</option>'; }).join('');
+    return '<div class="benefitrow">'+
+      '<div class="field compact"><label>'+s.polType+'</label><select data-id="'+p.id+'" data-k="type">'+typeOpts+'</select></div>'+
+      '<div class="field compact"><label>'+s.polSumAssured+'</label><input data-id="'+p.id+'" data-k="amount" type="number" value="'+p.amount+'"></div>'+
+      (rows.length > 1 ? '<button class="rmv-benefit" title="remove this benefit" data-rmb="'+p.id+'">✕</button>' : '<span></span>')+
+      '</div>';
+  }).join('');
+  return '<button class="rmv" title="remove policy" data-rm="'+groupId+'">✕</button>'+
+    '<div class="prow prow4"><div class="field compact"><label>'+s.polCompany+'</label>'+companySelectHTML(groupId, first.company, s)+'</div>'+
+    '<div class="field compact"><label>'+s.polName+'</label><input data-gid="'+groupId+'" data-k="name" value="'+first.name+'" placeholder="'+s.polPlaceholderName+'"></div>'+
+    '<div class="field compact"><label>'+s.polNumber+'</label><input data-gid="'+groupId+'" data-k="number" value="'+first.number+'"></div>'+
+    '<div class="field compact"><label>'+s.polPremium+'</label><input data-gid="'+groupId+'" data-k="premium" type="number" value="'+(first.premium||0)+'"></div></div>'+
+    '<div class="benefitlist">'+benefitRows+'</div>'+
+    '<button class="addbenefit" data-addb="'+groupId+'">+ '+s.polAddBenefit+'</button>';
 }
 
 function renderProtPolicies(){
   const s = L();
   const wrap = $('protPolicyRows');
   wrap.innerHTML = '';
-  protPolicies.forEach(function(p){
-    const row = document.createElement('div');
-    row.className = 'policycard';
-    row.dataset.id = p.id;
-    row.innerHTML = protPolicyRowHTML(p, 0, s);
-    wrap.appendChild(row);
-    wirePolicyRow(row, protPolicies);
+  const groups = groupBy(protPolicies, 'groupId');
+  groups.forEach(function(rows, groupId){
+    const card = document.createElement('div');
+    card.className = 'policycard';
+    card.dataset.gid = groupId;
+    card.innerHTML = protPolicyCardHTML(groupId, rows, s);
+    wrap.appendChild(card);
+
+    // shared fields (company/name/number/premium) apply to every row in this policy group
+    card.querySelectorAll('[data-gid]').forEach(function(inp){
+      const evt = inp.tagName === 'SELECT' ? 'change' : 'input';
+      inp.addEventListener(evt, function(e){
+        const k = e.target.dataset.k;
+        const groupRows = protPolicies.filter(function(p){ return p.groupId === groupId; });
+        if (k === 'companySelect'){
+          const otherInput = card.querySelector('[data-k="companyOther"]');
+          if (e.target.value === '__other__'){
+            otherInput.style.display = 'block';
+            groupRows.forEach(function(p){ p.company = otherInput.value; });
+            otherInput.focus();
+          } else {
+            otherInput.style.display = 'none';
+            otherInput.value = '';
+            groupRows.forEach(function(p){ p.company = e.target.value; });
+          }
+        } else if (k === 'companyOther'){
+          groupRows.forEach(function(p){ p.company = e.target.value; });
+        } else if (k === 'premium'){
+          groupRows.forEach(function(p){ p.premium = num(e.target.value); });
+        } else {
+          groupRows.forEach(function(p){ p[k] = e.target.value; });
+        }
+        calcAll();
+      });
+    });
+    // per-benefit fields (type/amount)
+    card.querySelectorAll('.benefitrow [data-id]').forEach(function(inp){
+      const evt = inp.tagName === 'SELECT' ? 'change' : 'input';
+      inp.addEventListener(evt, function(e){
+        const id = +e.target.dataset.id, k = e.target.dataset.k;
+        const p = protPolicies.find(function(x){ return x.id === id; });
+        if (!p) return;
+        p[k] = (k === 'amount') ? num(e.target.value) : e.target.value;
+        calcAll();
+      });
+    });
+    card.querySelector('[data-addb]').addEventListener('click', function(){
+      const groupRows = protPolicies.filter(function(p){ return p.groupId === groupId; });
+      const f = groupRows[0];
+      protPolicies.push({ id: policyIdSeq++, groupId: groupId, company: f.company, name: f.name, number: f.number, premium: f.premium, type: 'CI', amount: 0 });
+      renderProtPolicies();
+    });
+    card.querySelectorAll('[data-rmb]').forEach(function(b){
+      b.addEventListener('click', function(e){
+        protPolicies = protPolicies.filter(function(p){ return p.id !== +e.target.dataset.rmb; });
+        renderProtPolicies();
+        calcAll();
+      });
+    });
   });
   wrap.querySelectorAll('button[data-rm]').forEach(function(b){
     b.addEventListener('click', function(e){
-      protPolicies = protPolicies.filter(function(p){ return p.id !== +e.target.dataset.rm; });
+      const gid = e.target.dataset.rm;
+      protPolicies = protPolicies.filter(function(p){ return p.groupId !== gid; });
       renderProtPolicies();
       calcAll();
     });
   });
 }
 $('addProtPolicyBtn').addEventListener('click', function(){
-  protPolicies.push({ id: policyIdSeq++, company:'', name:'', number:'', type:'CI', amount:0 });
+  const gid = 'g' + (groupIdSeq++);
+  protPolicies.push({ id: policyIdSeq++, groupId: gid, company:'', name:'', number:'', premium:0, type:'CI', amount:0 });
   renderProtPolicies();
 });
 
 function accPolicyRowHTML(p, i, s){
   return '<button class="rmv" title="remove" data-rm="'+p.id+'">✕</button>'+
-    '<div class="prow"><div class="field compact"><label>'+s.polCompany+'</label>'+companySelectHTML(p, s)+'</div>'+
+    '<div class="prow prow4acc"><div class="field compact"><label>'+s.polCompany+'</label>'+companySelectHTML(p.id, p.company, s)+'</div>'+
     '<div class="field compact"><label>'+s.polName+'</label><input data-id="'+p.id+'" data-k="name" value="'+p.name+'" placeholder="'+s.polPlaceholderNameAcc+'"></div>'+
     '<div class="field compact"><label>'+s.polNumber+'</label><input data-id="'+p.id+'" data-k="number" value="'+p.number+'"></div></div>'+
-    '<div class="prow prow2acc"><div class="field compact"><label>'+s.polValue+'</label><input data-id="'+p.id+'" data-k="value" type="number" value="'+p.value+'"></div></div>';
+    '<div class="prow prow2acc"><div class="field compact"><label>'+s.polValue+'</label><input data-id="'+p.id+'" data-k="value" type="number" value="'+p.value+'"></div>'+
+    '<div class="field compact"><label>'+s.polPremium+'</label><input data-id="'+p.id+'" data-k="premium" type="number" value="'+(p.premium||0)+'"></div></div>';
 }
 
 function renderAccPolicies(){
@@ -720,7 +777,24 @@ function renderAccPolicies(){
     row.dataset.id = p.id;
     row.innerHTML = accPolicyRowHTML(p, 0, s);
     wrap.appendChild(row);
-    wirePolicyRow(row, accPolicies);
+    row.querySelectorAll('[data-id]').forEach(function(inp){
+      const evt = inp.tagName === 'SELECT' ? 'change' : 'input';
+      inp.addEventListener(evt, function(e){
+        const id = +e.target.dataset.id, k = e.target.dataset.k;
+        const p2 = accPolicies.find(function(x){ return x.id === id; });
+        if (!p2) return;
+        if (k === 'companySelect'){
+          const otherInput = row.querySelector('[data-k="companyOther"]');
+          if (e.target.value === '__other__'){ otherInput.style.display = 'block'; p2.company = otherInput.value; otherInput.focus(); }
+          else { otherInput.style.display = 'none'; otherInput.value = ''; p2.company = e.target.value; }
+        } else if (k === 'companyOther'){
+          p2.company = e.target.value;
+        } else {
+          p2[k] = (k === 'value' || k === 'premium') ? num(e.target.value) : e.target.value;
+        }
+        calcAll();
+      });
+    });
   });
   wrap.querySelectorAll('button[data-rm]').forEach(function(b){
     b.addEventListener('click', function(e){
@@ -731,7 +805,7 @@ function renderAccPolicies(){
   });
 }
 $('addAccPolicyBtn').addEventListener('click', function(){
-  accPolicies.push({ id: policyIdSeq++, company:'', name:'', number:'', value:0 });
+  accPolicies.push({ id: policyIdSeq++, company:'', name:'', number:'', value:0, premium:0 });
   renderAccPolicies();
 });
 
@@ -822,12 +896,12 @@ async function saveClientToDb(){
   await sb.from('goals').delete().eq('client_id', clientId);
   if (protPolicies.length){
     await sb.from('protection_policies').insert(protPolicies.map(function(p){
-      return { client_id: clientId, user_id: user.id, company: p.company, name: p.name, number: p.number, type: p.type, amount: num(p.amount) };
+      return { client_id: clientId, user_id: user.id, company: p.company, name: p.name, number: p.number, type: p.type, amount: num(p.amount), group_id: p.groupId, premium: num(p.premium) };
     }));
   }
   if (accPolicies.length){
     await sb.from('accumulation_policies').insert(accPolicies.map(function(p){
-      return { client_id: clientId, user_id: user.id, company: p.company, name: p.name, number: p.number, value: num(p.value) };
+      return { client_id: clientId, user_id: user.id, company: p.company, name: p.name, number: p.number, value: num(p.value), premium: num(p.premium) };
     }));
   }
   if (goals.length){
@@ -860,8 +934,13 @@ async function loadClientFromDb(clientId){
     sb.from('accumulation_policies').select('*').eq('client_id', clientId),
     sb.from('goals').select('*').eq('client_id', clientId)
   ]);
-  protPolicies = ((pp.data) || []).map(function(p){ return { id: policyIdSeq++, company: p.company || '', name: p.name || '', number: p.number || '', type: p.type || 'CI', amount: p.amount || 0 }; });
-  accPolicies = ((ap.data) || []).map(function(p){ return { id: policyIdSeq++, company: p.company || '', name: p.name || '', number: p.number || '', value: p.value || 0 }; });
+  const groupIdMap = {};
+  protPolicies = ((pp.data) || []).map(function(p){
+    const origGroup = p.group_id || ('legacy-' + p.id);
+    if (!groupIdMap[origGroup]) groupIdMap[origGroup] = 'g' + (groupIdSeq++);
+    return { id: policyIdSeq++, groupId: groupIdMap[origGroup], company: p.company || '', name: p.name || '', number: p.number || '', premium: p.premium || 0, type: p.type || 'CI', amount: p.amount || 0 };
+  });
+  accPolicies = ((ap.data) || []).map(function(p){ return { id: policyIdSeq++, company: p.company || '', name: p.name || '', number: p.number || '', value: p.value || 0, premium: p.premium || 0 }; });
   goals = (gl.data && gl.data.length) ? gl.data.map(function(g){ return { id: goalIdSeq++, name: g.name || '', amount: g.amount || 0, years: g.years || 0 }; }) : [{ id: goalIdSeq++, name: '', amount: 100000, years: 20 }];
 
   renderGoals();
@@ -1077,19 +1156,21 @@ function calcAll(){
   protPolicies.forEach(function(p){
     if (!p.company && !p.name && !p.number && !num(p.amount)) return;
     const amt = money(num(p.amount)) + ((p.type==='LTC' || p.type==='IP') ? '/mo' : '');
-    allEntries.push({ company: (p.company||'').trim(), category: s.catProtection+' — '+typeLabel(s, p.type), name: p.name||'—', number: p.number||'—', amount: amt });
+    allEntries.push({ company: (p.company||'').trim(), category: s.catProtection+' — '+typeLabel(s, p.type), name: p.name||'—', number: p.number||'—', amount: amt, groupKey: 'p:'+p.groupId, premium: num(p.premium) });
   });
   accPolicies.forEach(function(p){
     if (!p.company && !p.name && !p.number && !num(p.value)) return;
-    allEntries.push({ company: (p.company||'').trim(), category: s.catAccumulation, name: p.name||'—', number: p.number||'—', amount: money(num(p.value)) });
+    allEntries.push({ company: (p.company||'').trim(), category: s.catAccumulation, name: p.name||'—', number: p.number||'—', amount: money(num(p.value)), groupKey: 'a:'+p.id, premium: num(p.premium) });
   });
 
   const groups = {};
   const order = [];
+  const seenPolicy = {};
   allEntries.forEach(function(e){
     const key = e.company ? e.company.toLowerCase() : '\u0000nocompany';
-    if (!groups[key]) { groups[key] = { label: e.company || s.noCompany, items: [] }; order.push(key); }
+    if (!groups[key]) { groups[key] = { label: e.company || s.noCompany, items: [], policyKeys: {} }; order.push(key); }
     groups[key].items.push(e);
+    groups[key].policyKeys[e.groupKey] = true;
   });
   order.sort(function(a,b){
     if (a === '\u0000nocompany') return 1;
@@ -1104,11 +1185,15 @@ function calcAll(){
     const wrap = document.createElement('div');
     wrap.className = 'company-group';
     let rows = '';
+    const shownPremiumFor = {};
     g.items.forEach(function(it){
-      rows += '<tr><td>'+it.category+'</td><td>'+it.name+'</td><td>'+it.number+'</td><td>'+it.amount+'</td></tr>';
+      let premiumCell = '—';
+      if (it.premium > 0 && !shownPremiumFor[it.groupKey]) { premiumCell = money(it.premium); shownPremiumFor[it.groupKey] = true; }
+      rows += '<tr><td>'+it.category+'</td><td>'+it.name+'</td><td>'+it.number+'</td><td>'+it.amount+'</td><td>'+premiumCell+'</td></tr>';
     });
-    wrap.innerHTML = '<div class="company-heading"><span class="cname">'+g.label+'</span><span class="ccount">'+s.policyCount(g.items.length)+'</span></div>'+
-      '<div class="tablewrap"><table class="sum sub"><thead><tr><th>'+s.thcategory+'</th><th>'+s.thpolicyname+'</th><th>'+s.thpolicynum+'</th><th>'+s.thamount+'</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+    const policyCount = Object.keys(g.policyKeys).length;
+    wrap.innerHTML = '<div class="company-heading"><span class="cname">'+g.label+'</span><span class="ccount">'+s.policyCount(policyCount)+'</span></div>'+
+      '<div class="tablewrap"><table class="sum sub"><thead><tr><th>'+s.thcategory+'</th><th>'+s.thpolicyname+'</th><th>'+s.thpolicynum+'</th><th>'+s.thamount+'</th><th>'+s.thpremium+'</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
     psContainer.appendChild(wrap);
   });
   $('t-s4empty').textContent = allEntries.length === 0 ? s.s4empty : '';
