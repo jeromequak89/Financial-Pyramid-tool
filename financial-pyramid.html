@@ -57,6 +57,7 @@
 
   .card{background:var(--white);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px;}
   .card h3{font-family:'Fraunces',serif;font-size:16px;margin:0 0 14px;color:var(--navy-deep);display:flex;align-items:center;gap:8px;}
+  .wide-card{margin-top:18px;}
   .card h3 .n{background:var(--navy);color:var(--white);font-family:'IBM Plex Mono';font-size:11px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
   .field.compact input{font-size:16px;}
@@ -95,7 +96,7 @@
   table.sum.sub th{border-bottom:1px solid var(--line);}
 
   .goalrow{display:grid;grid-template-columns:1.4fr .8fr .6fr .9fr auto;gap:8px;align-items:end;margin-bottom:10px;}
-  .policycard{position:relative;border:1px solid var(--line);border-radius:6px;padding:16px 44px 14px 16px;margin-bottom:12px;background:#FCFBF8;}
+  .policycard{position:relative;border:1px solid var(--line);border-radius:6px;padding:16px 44px 14px 16px;margin-bottom:12px;background:#FCFBF8;max-width:840px;}
   .policycard .prow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
   .policycard .prow.prow2{grid-template-columns:1fr 1fr;margin-top:10px;}
   .policycard .prow.prow2acc{grid-template-columns:1fr;margin-top:10px;max-width:260px;}
@@ -245,13 +246,6 @@
           </div>
           <div class="notebox" id="t-c4note">Income Protection required = 75% of average monthly drawn income. LTC lump-sum reserve = 3× desired monthly payout, for 2/3-of-6-ADL failure.</div>
         </div>
-
-        <div class="card no-print">
-          <h3><span class="n">6</span><span id="t-c5h">Existing Protection Policies</span></h3>
-          <p style="font-size:12px;color:var(--slate);margin:0 0 10px;" id="t-c5sub">Every policy the client already holds — this list drives the Existing column on the Summary tab and becomes the client's policy summary.</p>
-          <div id="protPolicyRows"></div>
-          <button class="addgoal" id="addProtPolicyBtn">+ <span id="t-addpolicy">Add policy</span></button>
-        </div>
       </div>
 
       <div class="visual">
@@ -262,6 +256,13 @@
           <div class="notebox" id="protectionBudgetNote"></div>
         </div>
       </div>
+    </div>
+
+    <div class="card no-print wide-card">
+      <h3><span class="n">6</span><span id="t-c5h">Existing Protection Policies</span></h3>
+      <p style="font-size:12px;color:var(--slate);margin:0 0 10px;" id="t-c5sub">Every policy the client already holds — this list drives the Existing column on the Summary tab and becomes the client's policy summary.</p>
+      <div id="protPolicyRows"></div>
+      <button class="addgoal" id="addProtPolicyBtn">+ <span id="t-addpolicy">Add policy</span></button>
     </div>
   </div>
 
@@ -290,13 +291,6 @@
             </div>
           </div>
         </div>
-
-        <div class="card no-print">
-          <h3><span class="n">4</span><span id="t-a4h">Existing Accumulation Policies</span></h3>
-          <p style="font-size:12px;color:var(--slate);margin:0 0 10px;" id="t-a4sub">Endowments, ILPs, unit trusts, or other savings/investment plans already in force.</p>
-          <div id="accPolicyRows"></div>
-          <button class="addgoal" id="addAccPolicyBtn">+ <span id="t-addpolicy2">Add policy</span></button>
-        </div>
       </div>
 
       <div class="visual">
@@ -306,6 +300,13 @@
           <div id="accumulationPyramid"></div>
         </div>
       </div>
+    </div>
+
+    <div class="card no-print wide-card">
+      <h3><span class="n">4</span><span id="t-a4h">Existing Accumulation Policies</span></h3>
+      <p style="font-size:12px;color:var(--slate);margin:0 0 10px;" id="t-a4sub">Endowments, ILPs, unit trusts, or other savings/investment plans already in force.</p>
+      <div id="accPolicyRows"></div>
+      <button class="addgoal" id="addAccPolicyBtn">+ <span id="t-addpolicy2">Add policy</span></button>
     </div>
   </div>
 
