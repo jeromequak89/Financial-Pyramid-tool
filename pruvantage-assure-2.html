@@ -4739,18 +4739,21 @@
       }
 
       function localiseReport(report) {
+        const maybeTranslate = (value) =>
+          currentLang === "zh" ? translateString(value) : value;
+
         const localisePair = ([label, value]) => [
-          translateString(label),
-          typeof value === "string" ? translateString(value) : value
+          maybeTranslate(label),
+          typeof value === "string" ? maybeTranslate(value) : value
         ];
 
         return {
           ...report,
-          title: translateString(report.title),
+          title: maybeTranslate(report.title),
           inputs: report.inputs.map(localisePair),
           summary: report.summary.map(localisePair),
           columns: report.columns.map(([label, key, format]) => [
-            translateString(label),
+            maybeTranslate(label),
             key,
             format
           ])
