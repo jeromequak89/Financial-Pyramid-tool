@@ -89,6 +89,9 @@
   .barfill{height:100%;background:var(--moss);}
 
   .goalrow{display:grid;grid-template-columns:1.4fr .8fr .6fr .9fr auto;gap:8px;align-items:end;margin-bottom:10px;}
+  .goalrow.policyrow{grid-template-columns:1.1fr 1.2fr 1fr 1.1fr .8fr auto;}
+  .goalrow.policyrow-acc{grid-template-columns:1.1fr 1.3fr 1fr .9fr auto;}
+  .policyrow select{width:100%;border:none;border-bottom:1.5px solid var(--line);background:transparent;padding:6px 2px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--navy-deep);font-weight:600;outline:none;}
   .goalrow input{width:100%;}
   .rmv{background:none;border:none;color:var(--rust);cursor:pointer;font-size:16px;padding:4px;}
   .addgoal{font-family:inherit;font-weight:600;font-size:12px;color:var(--brass);background:none;border:1px dashed var(--brass-light);border-radius:4px;padding:7px 14px;cursor:pointer;margin-top:4px;}
@@ -122,6 +125,7 @@
     .brandblock h1{font-size:26px;}
     .card,.pyramidwrap,.clientbar,.toolbar{padding:16px;}
     .goalrow{grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:6px;padding:10px 10px 14px;gap:8px;position:relative;}
+    .goalrow.policyrow,.goalrow.policyrow-acc{grid-template-columns:1fr 1fr;}
     .goalrow > :first-child{grid-column:1/-1;}
     .goalrow input{min-height:38px;}
     .rmv{position:absolute;top:6px;right:8px;font-size:18px;padding:6px;}
@@ -185,26 +189,15 @@
             <label><input type="radio" name="dtpdMethod" value="10x" checked> <span id="t-dtpd10x">×10 annual income</span></label>
             <label><input type="radio" name="dtpdMethod" value="years"> <span id="t-dtpdyears">Years to dependent-independence</span></label>
           </div>
-          <div class="row" style="margin-top:10px;">
-            <div class="field compact"><label id="t-existdtpd">Existing Death/TPD coverage</label><input id="existDeathTPD" type="number" placeholder="0"></div>
-          </div>
         </div>
 
         <div class="card">
           <h3><span class="n">2</span><span id="t-c2h">Critical &amp; Early Critical Illness</span></h3>
-          <div class="row">
-            <div class="field compact"><label id="t-existci">Existing CI coverage</label><input id="existCI" type="number" placeholder="0"></div>
-            <div class="field compact"><label id="t-existeci">Existing ECI coverage</label><input id="existECI" type="number" placeholder="0"></div>
-          </div>
           <div class="notebox" id="t-c2note">CI required = $150,000 + 5× annual income. ECI required = higher of $150,000 or 25% of CI required.</div>
         </div>
 
         <div class="card">
           <h3><span class="n">3</span><span id="t-c3h">Accident &amp; Hospitalisation</span></h3>
-          <div class="row">
-            <div class="field compact"><label id="t-existaccident">Existing accident coverage</label><input id="existAccident" type="number" placeholder="0"></div>
-          </div>
-          <label class="checkline"><input type="checkbox" id="hasISP"> <span id="t-isp">Has Integrated Shield Plan + Rider</span></label>
           <div class="notebox" id="t-c3note">Accident cover tops up Death/TPD to a combined $1,000,000.</div>
         </div>
 
@@ -212,12 +205,15 @@
           <h3><span class="n">4</span><span id="t-c4h">Long-Term Care &amp; Income Protection</span></h3>
           <div class="row">
             <div class="field compact"><label id="t-ltcdesired">Desired LTC monthly payout</label><input id="ltcMonthly" type="number" placeholder="0"></div>
-            <div class="field compact"><label id="t-ltcexist">Existing LTC monthly payout</label><input id="existLTC" type="number" placeholder="0"></div>
-          </div>
-          <div class="row">
-            <div class="field compact"><label id="t-existip">Existing income protection (monthly)</label><input id="existIP" type="number" placeholder="0"></div>
           </div>
           <div class="notebox" id="t-c4note">Income Protection required = 75% of average monthly drawn income. LTC lump-sum reserve = 3× desired monthly payout, for 2/3-of-6-ADL failure.</div>
+        </div>
+
+        <div class="card">
+          <h3><span class="n">5</span><span id="t-c5h">Existing Protection Policies</span></h3>
+          <p style="font-size:12px;color:var(--slate);margin:0 0 10px;" id="t-c5sub">Every policy the client already holds — this list drives the Existing column on the Summary tab and becomes the client's policy summary.</p>
+          <div id="protPolicyRows"></div>
+          <button class="addgoal" id="addProtPolicyBtn">+ <span id="t-addpolicy">Add policy</span></button>
         </div>
       </div>
 
@@ -257,6 +253,13 @@
             </div>
           </div>
         </div>
+
+        <div class="card">
+          <h3><span class="n">4</span><span id="t-a4h">Existing Accumulation Policies</span></h3>
+          <p style="font-size:12px;color:var(--slate);margin:0 0 10px;" id="t-a4sub">Endowments, ILPs, unit trusts, or other savings/investment plans already in force.</p>
+          <div id="accPolicyRows"></div>
+          <button class="addgoal" id="addAccPolicyBtn">+ <span id="t-addpolicy2">Add policy</span></button>
+        </div>
       </div>
 
       <div class="visual">
@@ -294,6 +297,16 @@
       <h3><span class="n">§</span><span id="t-s3h">Goal Savings vs Capacity</span></h3>
       <div class="notebox" id="goalCapacityNote"></div>
     </div>
+
+    <div class="card">
+      <h3><span class="n">§</span><span id="t-s4h">Policy Summary</span></h3>
+      <p style="font-size:12px;color:var(--slate);margin:0 0 10px;" id="t-s4sub">Every policy entered under Protection and Accumulation, in one place — the client's copy of what they hold today.</p>
+      <div class="tablewrap"><table class="sum" id="policySummaryTable">
+        <thead><tr><th id="t-thcategory">Category</th><th id="t-thcompany">Company</th><th id="t-thpolicyname">Policy Name</th><th id="t-thpolicynum">Policy No.</th><th id="t-thamount">Amount</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <div class="plainnote" id="t-s4empty"></div>
+    </div>
   </div>
 
 </div>
@@ -321,16 +334,24 @@ en: {
   c4h:"Long-Term Care & Income Protection", ltcdesired:"Desired LTC monthly payout", ltcexist:"Existing LTC monthly payout",
   existip:"Existing income protection (monthly)",
   c4note:"Income Protection required = 75% of average monthly drawn income. LTC lump-sum reserve = 3× desired monthly payout, for 2/3-of-6-ADL failure.",
+  c5h:"Existing Protection Policies", c5sub:"Every policy the client already holds — this list drives the Existing column on the Summary tab and becomes the client's policy summary.",
+  addpolicy:"Add policy", polCompany:"Company", polName:"Policy Name", polNumber:"Policy No.", polType:"Benefit Type", polAmount:"Amount", polAmountHint:"lump sum, or /mo for Income Protection & LTC", polPlaceholderName:"e.g. PRUShield", polPlaceholderCompany:"e.g. Prudential",
+  typeDeathTPD:"Death & TPD", typeCI:"Critical Illness", typeECI:"Early CI", typeAccident:"Accident", typeHosp:"Hospitalisation", typeLTC:"Long-Term Care (/mo)", typeIP:"Income Protection (/mo)",
   ppyrh:"Wealth Protection Pyramid", ppyrsub:"Required coverage, calculated live from client inputs",
   a1h:"Emergency Fund", a1note:"Target = 3 to 6 months of monthly expenses. Uses the expenses figure entered above.",
   a2h:"Goals & Aspirations", a2sub:"What do they want? How long do they have? How much do they need?",
   addgoal:"Add goal", goalName:"Goal", goalTarget:"Target $", goalYears:"Years", goalPerMonth:"Per month", goalPlaceholder:"e.g. Retirement",
   a3h:"Must-Know: Rule of 72", roi:"Assumed ROI %", doubleyrs:"Years to double money",
   apyrh:"Wealth Accumulation Pyramid", apyrsub:"Recommended monthly allocation of net income",
+  a4h:"Existing Accumulation Policies", a4sub:"Endowments, ILPs, unit trusts, or other savings/investment plans already in force.",
+  polValue:"Current Value", polPlaceholderNameAcc:"e.g. PruVantage Assure 2",
   s1h:"Coverage: Required vs Existing vs Shortfall", thbenefit:"Benefit", threq:"Required", thex:"Existing", thshort:"Shortfall", thcov:"Coverage",
   fullyfunded:"Fully funded", s1note:"These figures cover different risks and are not meant to be added into a single total.",
   s2h:"Monthly Cash-Flow Allocation Check", thbucket:"Bucket", thmid:"Recommended (mid-point)", thrange:"Recommended range",
   s3h:"Goal Savings vs Capacity",
+  s4h:"Policy Summary", s4sub:"Every policy entered under Protection and Accumulation, in one place — the client's copy of what they hold today.",
+  thcategory:"Category", thcompany:"Company", thpolicyname:"Policy Name", thpolicynum:"Policy No.", thamount:"Amount",
+  s4empty:"No policies entered yet — add them under the Protection and Accumulation tabs.", catProtection:"Protection", catAccumulation:"Accumulation",
   rowDeathTPD:"Death / TPD", rowCI:"Critical Illness", rowECI:"Early CI", rowAccident:"Accident (to $1M)",
   rowIP:"Income Protection (/mo)", rowLTC:"Long-Term Care (/mo)",
   cfExpenses:"Expenses (cap 40%)", cfProtection:"Wealth Protection (15% ±5%)", cfMid:"Save/Invest Mid-term (25% ±5%)", cfLong:"Invest Long-term (20% ±5%)",
@@ -381,16 +402,24 @@ zh: {
   c4h:"长期护理与收入保障", ltcdesired:"期望的长期护理每月赔付", ltcexist:"现有长期护理每月赔付",
   existip:"现有收入保障（每月）",
   c4note:"所需收入保障 = 平均每月提取收入的75%。长期护理一次性储备 = 期望每月赔付的3倍，适用于6项日常生活能力中2/3项丧失的情况。",
+  c5h:"现有保障保单", c5sub:"客户目前持有的每一份保单——此列表将用于总结页的「现有」栏位，并生成客户的保单总览。",
+  addpolicy:"添加保单", polCompany:"保险公司", polName:"保单名称", polNumber:"保单号码", polType:"保障类型", polAmount:"保额", polAmountHint:"一次性保额，收入保障与长期护理为每月金额", polPlaceholderName:"例如：PRUShield", polPlaceholderCompany:"例如：保诚",
+  typeDeathTPD:"身故与全残", typeCI:"重大疾病", typeECI:"早期重疾", typeAccident:"意外", typeHosp:"住院", typeLTC:"长期护理（每月）", typeIP:"收入保障（每月）",
   ppyrh:"财富保障金字塔", ppyrsub:"所需保额，根据客户资料实时计算",
   a1h:"紧急备用金", a1note:"目标 = 每月支出的3至6倍，依据上方填写的支出金额计算。",
   a2h:"目标与愿望", a2sub:"他们想要什么？还有多长时间？需要多少钱？",
   addgoal:"添加目标", goalName:"目标", goalTarget:"目标金额", goalYears:"年数", goalPerMonth:"每月", goalPlaceholder:"例如：退休",
   a3h:"必知法则：72法则", roi:"假设投资回报率 %", doubleyrs:"资金翻倍所需年数",
   apyrh:"财富累积金字塔", apyrsub:"建议的每月净收入分配",
+  a4h:"现有累积保单", a4sub:"已生效的储蓄保险、投资连结保单、单位信托或其他储蓄/投资计划。",
+  polValue:"现有价值", polPlaceholderNameAcc:"例如：PruVantage Assure 2",
   s1h:"保障：所需 vs 现有 vs 缺口", thbenefit:"项目", threq:"所需", thex:"现有", thshort:"缺口", thcov:"保障进度",
   fullyfunded:"已足额", s1note:"以上金额分别对应不同风险类别，不应直接相加为单一总额。",
   s2h:"每月现金流分配检查", thbucket:"类别", thmid:"建议金额（中位数）", thrange:"建议范围",
   s3h:"目标储蓄 vs 储蓄能力",
+  s4h:"保单总览", s4sub:"客户在「财富保障」与「财富累积」下填写的所有保单，汇总于此——即客户可保留的保单总览。",
+  thcategory:"类别", thcompany:"保险公司", thpolicyname:"保单名称", thpolicynum:"保单号码", thamount:"金额",
+  s4empty:"尚未填写任何保单——请在「财富保障」与「财富累积」页签中添加。", catProtection:"保障", catAccumulation:"累积",
   rowDeathTPD:"身故 / 全残", rowCI:"重大疾病", rowECI:"早期重疾", rowAccident:"意外（补足至$1M）",
   rowIP:"收入保障（每月）", rowLTC:"长期护理（每月）",
   cfExpenses:"支出（上限40%）", cfProtection:"财富保障（15%±5%）", cfMid:"中期储蓄/投资（25%±5%）", cfLong:"长期投资（20%±5%）",
@@ -440,15 +469,18 @@ function applyStaticText(){
     't-clientname':'clientname','t-age':'age','t-netmonthly':'netmonthly','t-netmonthlyhint':'netmonthlyhint',
     't-expenses':'expenses','t-yearsdep':'yearsdep','t-yearsdephint':'yearsdephint','t-avgdrawn':'avgdrawn','t-avgdrawnhint':'avgdrawnhint',
     't-tabprotection':'tabprotection','t-tabaccumulation':'tabaccumulation','t-tabsummary':'tabsummary',
-    't-c1h':'c1h','t-dtpd10x':'dtpd10x','t-dtpdyears':'dtpdyears','t-existdtpd':'existdtpd',
-    't-c2h':'c2h','t-existci':'existci','t-existeci':'existeci','t-c2note':'c2note',
-    't-c3h':'c3h','t-existaccident':'existaccident','t-isp':'isp','t-c3note':'c3note',
-    't-c4h':'c4h','t-ltcdesired':'ltcdesired','t-ltcexist':'ltcexist','t-existip':'existip','t-c4note':'c4note',
+    't-c1h':'c1h','t-dtpd10x':'dtpd10x','t-dtpdyears':'dtpdyears',
+    't-c2h':'c2h','t-c2note':'c2note',
+    't-c3h':'c3h','t-c3note':'c3note',
+    't-c4h':'c4h','t-ltcdesired':'ltcdesired','t-c4note':'c4note',
+    't-c5h':'c5h','t-c5sub':'c5sub','t-addpolicy':'addpolicy',
     't-ppyrh':'ppyrh','t-ppyrsub':'ppyrsub',
     't-a1h':'a1h','t-a1note':'a1note','t-a2h':'a2h','t-a2sub':'a2sub','t-addgoal':'addgoal',
     't-a3h':'a3h','t-roi':'roi','t-doubleyrs':'doubleyrs','t-apyrh':'apyrh','t-apyrsub':'apyrsub',
+    't-a4h':'a4h','t-a4sub':'a4sub','t-addpolicy2':'addpolicy',
     't-s1h':'s1h','t-thbenefit':'thbenefit','t-threq':'threq','t-thex':'thex','t-thshort':'thshort','t-thcov':'thcov','t-s1note':'s1note',
-    't-s2h':'s2h','t-thbucket':'thbucket','t-thmid':'thmid','t-thrange':'thrange','t-s3h':'s3h'
+    't-s2h':'s2h','t-thbucket':'thbucket','t-thmid':'thmid','t-thrange':'thrange','t-s3h':'s3h',
+    't-s4h':'s4h','t-s4sub':'s4sub','t-thcategory':'thcategory','t-thcompany':'thcompany','t-thpolicyname':'thpolicyname','t-thpolicynum':'thpolicynum','t-thamount':'thamount'
   };
   Object.keys(map).forEach(function(id){ const el = $(id); if (el) el.textContent = s[map[id]]; });
   $('avgDrawnIncome').placeholder = s.avgdrawn;
@@ -516,6 +548,107 @@ $('addGoalBtn').addEventListener('click', function(){
   renderGoals();
 });
 
+/* ---------------- Existing policy registers (Protection + Accumulation) ---------------- */
+let policyIdSeq = 1;
+let protPolicies = [];
+let accPolicies = [];
+
+const PROT_TYPES = ['DeathTPD','CI','ECI','Accident','Hospitalisation','LTC','IP'];
+function typeLabel(s, key){
+  return { DeathTPD:s.typeDeathTPD, CI:s.typeCI, ECI:s.typeECI, Accident:s.typeAccident, Hospitalisation:s.typeHosp, LTC:s.typeLTC, IP:s.typeIP }[key];
+}
+
+function protPolicyRowHTML(p, i, s){
+  const opts = PROT_TYPES.map(function(k){ return '<option value="'+k+'"'+(p.type===k?' selected':'')+'>'+typeLabel(s,k)+'</option>'; }).join('');
+  return '<div class="field compact"><label>'+(i===0? s.polCompany : '')+'</label><input data-id="'+p.id+'" data-k="company" value="'+p.company+'" placeholder="'+s.polPlaceholderCompany+'"></div>'+
+    '<div class="field compact"><label>'+(i===0? s.polName : '')+'</label><input data-id="'+p.id+'" data-k="name" value="'+p.name+'" placeholder="'+s.polPlaceholderName+'"></div>'+
+    '<div class="field compact"><label>'+(i===0? s.polNumber : '')+'</label><input data-id="'+p.id+'" data-k="number" value="'+p.number+'"></div>'+
+    '<div class="field compact"><label>'+(i===0? s.polType : '')+'</label><select data-id="'+p.id+'" data-k="type">'+opts+'</select></div>'+
+    '<div class="field compact"><label>'+(i===0? s.polAmount : '')+'</label><input data-id="'+p.id+'" data-k="amount" type="number" value="'+p.amount+'"></div>'+
+    '<button class="rmv" title="remove" data-rm="'+p.id+'">✕</button>';
+}
+
+function renderProtPolicies(){
+  const s = L();
+  const wrap = $('protPolicyRows');
+  wrap.innerHTML = '';
+  protPolicies.forEach(function(p, i){
+    const row = document.createElement('div');
+    row.className = 'goalrow policyrow';
+    row.dataset.id = p.id;
+    row.innerHTML = protPolicyRowHTML(p, i, s);
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll('[data-id]').forEach(function(inp){
+    inp.addEventListener('input', function(e){
+      const id = +e.target.dataset.id, k = e.target.dataset.k;
+      const p = protPolicies.find(function(x){ return x.id === id; });
+      if (!p) return;
+      p[k] = (k === 'amount') ? num(e.target.value) : e.target.value;
+      calcAll();
+    });
+    inp.addEventListener('change', function(e){
+      const id = +e.target.dataset.id, k = e.target.dataset.k;
+      const p = protPolicies.find(function(x){ return x.id === id; });
+      if (!p) return;
+      p[k] = (k === 'amount') ? num(e.target.value) : e.target.value;
+      calcAll();
+    });
+  });
+  wrap.querySelectorAll('button[data-rm]').forEach(function(b){
+    b.addEventListener('click', function(e){
+      protPolicies = protPolicies.filter(function(p){ return p.id !== +e.target.dataset.rm; });
+      renderProtPolicies();
+      calcAll();
+    });
+  });
+}
+$('addProtPolicyBtn').addEventListener('click', function(){
+  protPolicies.push({ id: policyIdSeq++, company:'', name:'', number:'', type:'CI', amount:0 });
+  renderProtPolicies();
+});
+
+function accPolicyRowHTML(p, i, s){
+  return '<div class="field compact"><label>'+(i===0? s.polCompany : '')+'</label><input data-id="'+p.id+'" data-k="company" value="'+p.company+'" placeholder="'+s.polPlaceholderCompany+'"></div>'+
+    '<div class="field compact"><label>'+(i===0? s.polName : '')+'</label><input data-id="'+p.id+'" data-k="name" value="'+p.name+'" placeholder="'+s.polPlaceholderNameAcc+'"></div>'+
+    '<div class="field compact"><label>'+(i===0? s.polNumber : '')+'</label><input data-id="'+p.id+'" data-k="number" value="'+p.number+'"></div>'+
+    '<div class="field compact"><label>'+(i===0? s.polValue : '')+'</label><input data-id="'+p.id+'" data-k="value" type="number" value="'+p.value+'"></div>'+
+    '<button class="rmv" title="remove" data-rm="'+p.id+'">✕</button>';
+}
+
+function renderAccPolicies(){
+  const s = L();
+  const wrap = $('accPolicyRows');
+  wrap.innerHTML = '';
+  accPolicies.forEach(function(p, i){
+    const row = document.createElement('div');
+    row.className = 'goalrow policyrow policyrow-acc';
+    row.dataset.id = p.id;
+    row.innerHTML = accPolicyRowHTML(p, i, s);
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll('[data-id]').forEach(function(inp){
+    inp.addEventListener('input', function(e){
+      const id = +e.target.dataset.id, k = e.target.dataset.k;
+      const p = accPolicies.find(function(x){ return x.id === id; });
+      if (!p) return;
+      p[k] = (k === 'value') ? num(e.target.value) : e.target.value;
+      calcAll();
+    });
+  });
+  wrap.querySelectorAll('button[data-rm]').forEach(function(b){
+    b.addEventListener('click', function(e){
+      accPolicies = accPolicies.filter(function(p){ return p.id !== +e.target.dataset.rm; });
+      renderAccPolicies();
+      calcAll();
+    });
+  });
+}
+$('addAccPolicyBtn').addEventListener('click', function(){
+  accPolicies.push({ id: policyIdSeq++, company:'', name:'', number:'', value:0 });
+  renderAccPolicies();
+});
+
 function buildPyramid(container, sections, colors){
   const n = sections.length;
   const vw = 300, vh = 264, apexY = 8, baseY = 258, cx = 150, baseHalf = 138;
@@ -563,22 +696,26 @@ function refreshClientSelect(){
   if (clients[current]) sel.value = current;
 }
 const FORM_IDS = ['clientName','clientAge','netMonthly','monthlyExpenses','yearsDependent','avgDrawnIncome',
-  'existDeathTPD','existCI','existECI','existAccident','ltcMonthly','existLTC','existIP','rule72roi'];
+  'ltcMonthly','rule72roi'];
 function serializeState(){
   const state = {};
   FORM_IDS.forEach(function(id){ const el = $(id); if (el) state[id] = el.value; });
-  state.hasISP = $('hasISP').checked;
   state.dtpdMethod = document.querySelector('input[name="dtpdMethod"]:checked').value;
   state.goals = goals;
+  state.protPolicies = protPolicies;
+  state.accPolicies = accPolicies;
   return state;
 }
 function loadState(state){
   FORM_IDS.forEach(function(id){ const el = $(id); if (el && state[id] !== undefined) el.value = state[id]; });
-  $('hasISP').checked = !!state.hasISP;
   const r = document.querySelector('input[name="dtpdMethod"][value="'+(state.dtpdMethod || '10x')+'"]');
   if (r) r.checked = true;
   goals = (state.goals && state.goals.length) ? state.goals.map(function(g){ return Object.assign({}, g, { id: goalIdSeq++ }); }) : goals;
+  protPolicies = (state.protPolicies && state.protPolicies.length) ? state.protPolicies.map(function(p){ return Object.assign({}, p, { id: policyIdSeq++ }); }) : [];
+  accPolicies = (state.accPolicies && state.accPolicies.length) ? state.accPolicies.map(function(p){ return Object.assign({}, p, { id: policyIdSeq++ }); }) : [];
   renderGoals();
+  renderProtPolicies();
+  renderAccPolicies();
   calcAll();
 }
 function showStatus(text){ const el = $('clientStatus'); el.textContent = text; setTimeout(function(){ if (el.textContent === text) el.textContent = ''; }, 2500); }
@@ -614,6 +751,8 @@ $('langBtn').addEventListener('click', function(){
   lang = lang === 'en' ? 'zh' : 'en';
   applyStaticText();
   renderGoals();
+  renderProtPolicies();
+  renderAccPolicies();
   refreshClientSelect();
   calcAll();
 });
@@ -631,24 +770,22 @@ function calcAll(){
   const dtpd10x = 10 * NI;
   const dtpdYears = yearsDep * NI;
   const dtpdRequired = dtpdMethod === '10x' ? dtpd10x : dtpdYears;
-  const existDeathTPD = num($('existDeathTPD').value);
+
+  function sumByType(type){ return protPolicies.filter(function(p){ return p.type===type; }).reduce(function(sum,p){ return sum + num(p.amount); }, 0); }
+  const existDeathTPD = sumByType('DeathTPD');
+  const existAccident = sumByType('Accident');
+  const existCI = sumByType('CI');
+  const existECI = sumByType('ECI');
+  const existLTC = sumByType('LTC');
+  const existIP = sumByType('IP');
+  const hasISP = protPolicies.some(function(p){ return p.type==='Hospitalisation'; });
 
   const accidentRequired = clamp0(1000000 - dtpdRequired);
-  const existAccident = num($('existAccident').value);
-
   const ciRequired = 150000 + 5 * NI;
-  const existCI = num($('existCI').value);
   const eciRequired = Math.max(150000, 0.25 * ciRequired);
-  const existECI = num($('existECI').value);
-
   const ltcMonthly = num($('ltcMonthly').value);
   const ltcLump = 3 * ltcMonthly;
-  const existLTC = num($('existLTC').value);
-
   const ipRequired = 0.75 * avgDrawn;
-  const existIP = num($('existIP').value);
-
-  const hasISP = $('hasISP').checked;
 
   const pb = s.bandsProtection;
   const sections = [
@@ -749,6 +886,23 @@ function calcAll(){
   $('goalCapacityNote').innerHTML = capacity>0
     ? s.goalNote(money(monthlyGoalNeed), money(capacity), monthlyGoalNeed>capacity, monthlyGoalNeed>capacity? money(monthlyGoalNeed-capacity) : money(capacity-monthlyGoalNeed))
     : s.goalNoneNote;
+
+  const psBody = document.querySelector('#policySummaryTable tbody');
+  psBody.innerHTML = '';
+  protPolicies.forEach(function(p){
+    if (!p.company && !p.name && !p.number && !num(p.amount)) return;
+    const amt = money(num(p.amount)) + ((p.type==='LTC' || p.type==='IP') ? '/mo' : '');
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+s.catProtection+' — '+typeLabel(s, p.type)+'</td><td>'+(p.company||'—')+'</td><td>'+(p.name||'—')+'</td><td>'+(p.number||'—')+'</td><td>'+amt+'</td>';
+    psBody.appendChild(tr);
+  });
+  accPolicies.forEach(function(p){
+    if (!p.company && !p.name && !p.number && !num(p.value)) return;
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+s.catAccumulation+'</td><td>'+(p.company||'—')+'</td><td>'+(p.name||'—')+'</td><td>'+(p.number||'—')+'</td><td>'+money(num(p.value))+'</td>';
+    psBody.appendChild(tr);
+  });
+  $('t-s4empty').textContent = psBody.children.length === 0 ? s.s4empty : '';
 }
 
 document.querySelectorAll('.clientbar input, .card input').forEach(function(el){
@@ -756,7 +910,6 @@ document.querySelectorAll('.clientbar input, .card input').forEach(function(el){
   el.addEventListener('change', function(){ calcAll(); });
 });
 document.querySelectorAll('input[name="dtpdMethod"]').forEach(function(r){ r.addEventListener('change', function(){ calcAll(); }); });
-$('hasISP').addEventListener('change', function(){ calcAll(); });
 
 $('resetBtn').addEventListener('click', function(){
   if (!confirm(lang==='zh' ? '清除所有栏位以开始新客户？' : 'Clear all fields for a new client?')) return;
@@ -764,13 +917,19 @@ $('resetBtn').addEventListener('click', function(){
   document.querySelector('input[name="dtpdMethod"][value="10x"]').checked = true;
   $('rule72roi').value = 5;
   goals = [{ id: goalIdSeq++, name: '', amount: 100000, years: 20 }];
+  protPolicies = [];
+  accPolicies = [];
   renderGoals();
+  renderProtPolicies();
+  renderAccPolicies();
   calcAll();
 });
 $('printBtn').addEventListener('click', function(){ window.print(); });
 
 applyStaticText();
 renderGoals();
+renderProtPolicies();
+renderAccPolicies();
 refreshClientSelect();
 calcAll();
 </script>
