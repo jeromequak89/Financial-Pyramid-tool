@@ -279,7 +279,7 @@
 
         <div class="card">
           <h3><span class="n">4</span><span id="t-c3bh">Hospitalisation</span></h3>
-          <div class="notebox" id="t-c3bnote">Qualitative cover, not a dollar amount — add a policy below and set its Benefit Type to Hospitalisation to flag Integrated Shield Plan + Rider coverage on the pyramid.</div>
+          <div class="notebox" id="t-c3bnote">Qualitative cover, not a dollar amount — a hospital plan usually has two parts. Add each below: set Benefit Type to "Hospitalisation (Main Plan)" for the Integrated Shield Plan, and a separate row set to "Hospitalisation (Rider)" for the rider that covers the copay/deductible. The pyramid shows both separately, since having one without the other is a common gap.</div>
         </div>
 
         <div class="card">
@@ -548,7 +548,7 @@ en: {
   c1h:"Death & TPD", dtpd10x:"×10 annual income", dtpdyears:"Years to dependent-independence", existdtpd:"Existing Death/TPD coverage",
   c2h:"Critical & Early Critical Illness", existci:"Existing CI coverage", existeci:"Existing ECI coverage",
   c2note:"CI required = $150,000 + 5× annual income. ECI required = higher of $150,000 or 25% of CI required.",
-  c3h:"Accident", c3bh:"Hospitalisation", c3bnote:"Qualitative cover, not a dollar amount — add a policy below and set its Benefit Type to Hospitalisation to flag Integrated Shield Plan + Rider coverage on the pyramid.",
+  c3h:"Accident", c3bh:"Hospitalisation", c3bnote:"Qualitative cover, not a dollar amount — a hospital plan usually has two parts. Add each below: set Benefit Type to \"Hospitalisation (Main Plan)\" for the Integrated Shield Plan, and a separate row set to \"Hospitalisation (Rider)\" for the rider that covers the copay/deductible. The pyramid shows both separately, since having one without the other is a common gap.",
   isp:"Has Integrated Shield Plan + Rider",
   c3note:"Accident cover tops up Death/TPD to a combined $1,000,000.",
   c4h:"Long-Term Care & Income Protection", ltcdesired:"Desired LTC monthly payout", ltcexist:"Existing LTC monthly payout",
@@ -557,7 +557,8 @@ en: {
   c5h:"Existing Protection Policies", c5sub:"Every policy the client already holds — this list drives the Existing column on the Summary tab and becomes the client's policy summary.",
   addpolicy:"Add policy", polCompany:"Company", polName:"Policy Name", polNumber:"Policy No.", polType:"Benefit Type", polSumAssured:"Sum Assured", polPremium:"Annual Premium", polAddBenefit:"Add another benefit on this policy", polPlaceholderName:"e.g. PRUShield",
   polSelectCompany:"— Select company —", polOther:"Other", polOtherPlaceholder:"Enter company name",
-  typeDeathTPD:"Death & TPD", typeCI:"Critical Illness", typeECI:"Early CI", typeAccident:"Accident", typeHosp:"Hospitalisation", typeLTC:"Long-Term Care (/mo)", typeIP:"Income Protection (/mo)",
+  typeDeathTPD:"Death & TPD", typeCI:"Critical Illness", typeECI:"Early CI", typeAccident:"Accident", typeHospMain:"Hospitalisation (Main Plan)", typeHospRider:"Hospitalisation (Rider)", typeLTC:"Long-Term Care (/mo)", typeIP:"Income Protection (/mo)",
+  hospFlag:function(main, rider){ return 'Main '+(main?'✓':'✕')+' · Rider '+(rider?'✓':'✕'); },
   ppyrh:"Wealth Protection Pyramid", ppyrsub:"Required coverage, calculated live from client inputs",
   a1h:"Emergency Fund", a1note:"Target = 3 to 6 months of monthly expenses. Uses the expenses figure entered above.",
   a2h:"Goals & Aspirations", a2sub:"What do they want? How long do they have? How much do they need?",
@@ -618,7 +619,7 @@ zh: {
   c1h:"身故与全残保障", dtpd10x:"年收入的10倍", dtpdyears:"至受抚养人经济独立的年数", existdtpd:"现有身故/全残保额",
   c2h:"重大疾病与早期重疾", existci:"现有重疾保额", existeci:"现有早期重疾保额",
   c2note:"所需重疾保额 = $150,000 + 年收入 × 5。所需早期重疾保额 = $150,000 与重疾保额25%中的较高者。",
-  c3h:"意外", c3bh:"住院", c3bnote:"定性保障，非金额指标——请在下方添加保单，并将其保障类型设为「住院」，以在金字塔上标示已投保综合健保双全计划及附加险。",
+  c3h:"意外", c3bh:"住院", c3bnote:"定性保障，非金额指标——住院保障通常分为两部分。请在下方分别添加：将保障类型设为「住院（主约）」以记录综合健保双全计划，另加一行设为「住院（附加险）」以记录承担自付额/垫底费的附加险。金字塔会分别显示两者，因为只有其中一项而缺少另一项是常见的保障缺口。",
   isp:"已投保综合健保双全计划及附加险",
   c3note:"意外保障用于将身故/全残保额补足至合计$1,000,000。",
   c4h:"长期护理与收入保障", ltcdesired:"期望的长期护理每月赔付", ltcexist:"现有长期护理每月赔付",
@@ -627,7 +628,8 @@ zh: {
   c5h:"现有保障保单", c5sub:"客户目前持有的每一份保单——此列表将用于总结页的「现有」栏位，并生成客户的保单总览。",
   addpolicy:"添加保单", polCompany:"保险公司", polName:"保单名称", polNumber:"保单号码", polType:"保障类型", polSumAssured:"保额", polPremium:"年缴保费", polAddBenefit:"在此保单下添加其他保障项目", polPlaceholderName:"例如：PRUShield",
   polSelectCompany:"— 请选择保险公司 —", polOther:"其他", polOtherPlaceholder:"请输入保险公司名称",
-  typeDeathTPD:"身故与全残", typeCI:"重大疾病", typeECI:"早期重疾", typeAccident:"意外", typeHosp:"住院", typeLTC:"长期护理（每月）", typeIP:"收入保障（每月）",
+  typeDeathTPD:"身故与全残", typeCI:"重大疾病", typeECI:"早期重疾", typeAccident:"意外", typeHospMain:"住院（主约）", typeHospRider:"住院（附加险）", typeLTC:"长期护理（每月）", typeIP:"收入保障（每月）",
+  hospFlag:function(main, rider){ return '主约 '+(main?'✓':'✕')+' · 附加险 '+(rider?'✓':'✕'); },
   ppyrh:"财富保障金字塔", ppyrsub:"所需保额，根据客户资料实时计算",
   a1h:"紧急备用金", a1note:"目标 = 每月支出的3至6倍，依据上方填写的支出金额计算。",
   a2h:"目标与愿望", a2sub:"他们想要什么？还有多长时间？需要多少钱？",
@@ -779,9 +781,10 @@ let protPolicies = [];
 let accPolicies = [];
 
 const COMPANIES = ['Prudential','AIA','Great Eastern','Singlife','NTUC','Manulife','Tokio Marine','HSBC','FWD'];
-const PROT_TYPES = ['DeathTPD','CI','ECI','Accident','Hospitalisation','LTC','IP'];
+const PROT_TYPES = ['DeathTPD','CI','ECI','Accident','HospMain','HospRider','LTC','IP'];
 function typeLabel(s, key){
-  return { DeathTPD:s.typeDeathTPD, CI:s.typeCI, ECI:s.typeECI, Accident:s.typeAccident, Hospitalisation:s.typeHosp, LTC:s.typeLTC, IP:s.typeIP }[key];
+  const dict = { DeathTPD:s.typeDeathTPD, CI:s.typeCI, ECI:s.typeECI, Accident:s.typeAccident, HospMain:s.typeHospMain, HospRider:s.typeHospRider, Hospitalisation:s.typeHospMain, LTC:s.typeLTC, IP:s.typeIP };
+  return dict[key] || key;
 }
 function companySelectHTML(rowId, company, s){
   const isOther = company && COMPANIES.indexOf(company) === -1;
@@ -1184,7 +1187,8 @@ function calcAll(){
   const existECI = sumByType('ECI');
   const existLTC = sumByType('LTC');
   const existIP = sumByType('IP');
-  const hasISP = protPolicies.some(function(p){ return p.type==='Hospitalisation'; });
+  const hasHospMain = protPolicies.some(function(p){ return p.type==='HospMain' || p.type==='Hospitalisation'; });
+  const hasHospRider = protPolicies.some(function(p){ return p.type==='HospRider'; });
 
   const accidentRequired = clamp0(1000000 - dtpdRequired);
   const ciRequired = 150000 + 5 * NI;
@@ -1199,7 +1203,7 @@ function calcAll(){
     { label: pb[1].l, sub: pb[1].r + ' — ' + money(ciRequired) },
     { label: pb[2].l, sub: pb[2].r + ' — ' + money(eciRequired) },
     { label: pb[3].l, sub: pb[3].r + ' — ' + money(accidentRequired) },
-    { label: pb[4].l, sub: pb[4].r, flag: hasISP ? '✓' : '✕', flagColor: hasISP ? '#3F6B4F' : '#A44A3F' },
+    { label: pb[4].l, sub: pb[4].r, flag: s.hospFlag(hasHospMain, hasHospRider), flagColor: (hasHospMain && hasHospRider) ? '#3F6B4F' : '#A44A3F' },
     { label: pb[5].l, sub: money(ltcMonthly)+'/mo · '+money(ltcLump)+' lump' },
     { label: pb[6].l, sub: pb[6].r + ' — ' + money(ipRequired)+'/mo' }
   ];
