@@ -559,6 +559,8 @@ en: {
   polSelectCompany:"— Select company —", polOther:"Other", polOtherPlaceholder:"Enter company name",
   typeDeathTPD:"Death & TPD", typeCI:"Critical Illness", typeECI:"Early CI", typeAccident:"Accident", typeHospMain:"Hospitalisation (Main Plan)", typeHospRider:"Hospitalisation (Rider)", typeLTC:"Long-Term Care (/mo)", typeIP:"Income Protection (/mo)",
   hospFlag:function(main, rider){ return 'Main '+(main?'✓':'✕')+' · Rider '+(rider?'✓':'✕'); },
+  rowHospitalisation:"Hospitalisation", hospRequiredLabel:"Main Plan + Rider",
+  hospGapNone:"Not covered", hospGapMain:"Main Plan missing", hospGapRider:"Rider missing",
   ppyrh:"Wealth Protection Pyramid", ppyrsub:"Required coverage, calculated live from client inputs",
   a1h:"Emergency Fund", a1note:"Target = 3 to 6 months of monthly expenses. Uses the expenses figure entered above.",
   a2h:"Goals & Aspirations", a2sub:"What do they want? How long do they have? How much do they need?",
@@ -630,6 +632,8 @@ zh: {
   polSelectCompany:"— 请选择保险公司 —", polOther:"其他", polOtherPlaceholder:"请输入保险公司名称",
   typeDeathTPD:"身故与全残", typeCI:"重大疾病", typeECI:"早期重疾", typeAccident:"意外", typeHospMain:"住院（主约）", typeHospRider:"住院（附加险）", typeLTC:"长期护理（每月）", typeIP:"收入保障（每月）",
   hospFlag:function(main, rider){ return '主约 '+(main?'✓':'✕')+' · 附加险 '+(rider?'✓':'✕'); },
+  rowHospitalisation:"住院", hospRequiredLabel:"主约 + 附加险",
+  hospGapNone:"尚未投保", hospGapMain:"缺少主约", hospGapRider:"缺少附加险",
   ppyrh:"财富保障金字塔", ppyrsub:"所需保额，根据客户资料实时计算",
   a1h:"紧急备用金", a1note:"目标 = 每月支出的3至6倍，依据上方填写的支出金额计算。",
   a2h:"目标与愿望", a2sub:"他们想要什么？还有多长时间？需要多少钱？",
@@ -1253,6 +1257,18 @@ function calcAll(){
       '<td class="barcell"><div class="bartrack"><div class="barfill" style="width:'+pct+'%"></div></div></td>';
     tbody.appendChild(tr);
   });
+
+  // Hospitalisation isn't a dollar figure, so it gets its own row logic: status instead of required/shortfall amounts.
+  const hospPct = ((hasHospMain?1:0) + (hasHospRider?1:0)) / 2 * 100;
+  const hospGapText = (hasHospMain && hasHospRider) ? s.fullyfunded
+    : (!hasHospMain && !hasHospRider) ? s.hospGapNone
+    : (!hasHospMain) ? s.hospGapMain
+    : s.hospGapRider;
+  const hospRow = document.createElement('tr');
+  hospRow.innerHTML = '<td>'+s.rowHospitalisation+'</td><td>'+s.hospRequiredLabel+'</td><td>'+s.hospFlag(hasHospMain, hasHospRider)+'</td>'+
+    '<td class="'+((hasHospMain && hasHospRider)?'shortfall-ok':'shortfall-neg')+'">'+hospGapText+'</td>'+
+    '<td class="barcell"><div class="bartrack"><div class="barfill" style="width:'+hospPct+'%"></div></div></td>';
+  tbody.appendChild(hospRow);
 
   const cta = $('ctaBanner');
   // Fixed priority order (not sorted by dollar size): CI, Early CI, Income Protection, Accident, then Death/TPD, LTC.
