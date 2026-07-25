@@ -159,9 +159,150 @@
 
   <footer><b>CONFIDENTIAL</b> — Internal agent tools. Not for external distribution.</footer>
 </div>
+<!-- ============================================================
+     FAA Insurance Assistant — chat widget (Phase 1)
+     Drop this block just before the closing </div> of #mainApp
+     on each page (so it only ever shows once an agent is logged in).
+     ============================================================ -->
+<div id="faaChatRoot">
+  <button id="faaChatBubble" aria-label="Open FAA Assistant">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
+      <path d="M4 4h16v12H7l-3 3V4Z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div id="faaChatPanel" style="display:none;">
+    <div id="faaChatHeader">
+      <span>FAA Assistant</span>
+      <button id="faaChatClose" aria-label="Close">✕</button>
+    </div>
+    <div id="faaChatDisclaimer">General insurance &amp; finance guidance only — not FAA product-specific. Verify product details with compliance.</div>
+    <div id="faaChatMessages"></div>
+    <div id="faaChatInputRow">
+      <textarea id="faaChatInput" rows="1" placeholder="Ask a general insurance or finance question…"></textarea>
+      <button id="faaChatSend" aria-label="Send">→</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  #faaChatRoot{position:fixed;right:20px;bottom:20px;z-index:9998;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;}
+  #faaChatBubble{width:52px;height:52px;border-radius:50%;background:#14213D;border:none;box-shadow:0 6px 20px rgba(20,33,61,.35);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  #faaChatBubble:hover{background:#0B1526;}
+  #faaChatPanel{position:absolute;right:0;bottom:64px;width:340px;max-width:calc(100vw - 40px);height:460px;max-height:calc(100vh - 110px);background:#fff;border-radius:10px;box-shadow:0 20px 50px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden;border:1px solid #DCD7CC;}
+  #faaChatHeader{background:#14213D;color:#fff;padding:12px 14px;font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:space-between;font-family:Georgia,serif;}
+  #faaChatHeader button{background:none;border:none;color:#fff;font-size:15px;cursor:pointer;opacity:.8;}
+  #faaChatHeader button:hover{opacity:1;}
+  #faaChatDisclaimer{font-size:10px;line-height:1.4;color:#5B6472;background:#FBF8F1;border-bottom:1px solid #DCD7CC;padding:7px 12px;}
+  #faaChatMessages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:#FAFAF7;}
+  .faaChatMsg{max-width:85%;padding:8px 11px;border-radius:8px;font-size:13px;line-height:1.45;white-space:pre-wrap;}
+  .faaChatMsg.user{align-self:flex-end;background:#14213D;color:#fff;border-bottom-right-radius:2px;}
+  .faaChatMsg.bot{align-self:flex-start;background:#EFEAE0;color:#14213D;border-bottom-left-radius:2px;}
+  .faaChatMsg.error{align-self:flex-start;background:#F5E1DD;color:#9C3B2E;}
+  .faaChatMsg.pending{align-self:flex-start;background:#EFEAE0;color:#5B6472;font-style:italic;}
+  #faaChatInputRow{display:flex;gap:8px;padding:10px;border-top:1px solid #DCD7CC;background:#fff;}
+  #faaChatInput{flex:1;resize:none;border:1.5px solid #DCD7CC;border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;outline:none;max-height:80px;}
+  #faaChatInput:focus{border-color:#B0894F;}
+  #faaChatSend{width:36px;height:36px;flex-shrink:0;border-radius:6px;border:none;background:#14213D;color:#fff;font-size:16px;cursor:pointer;}
+  #faaChatSend:hover{background:#0B1526;}
+  #faaChatSend:disabled{opacity:.5;cursor:not-allowed;}
+  @media (max-width:480px){ #faaChatPanel{width:calc(100vw - 24px);right:-8px;} }
+</style>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  // Same Supabase project as the rest of the FAA tools.
+  var SUPABASE_URL = "https://ygbtbhyvpworrmuezsrf.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYnRiaHl2cHdvcnJtdWV6c3JmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4ODQ2ODAsImV4cCI6MjEwMDQ2MDY4MH0.sSDhdcUPvSqDkaKakUHJSjEszVAaibEYwGqiDPh6Tc8";
+  var FUNCTION_URL = SUPABASE_URL + "/functions/v1/insurance-chat";
+
+  // Widget keeps its own Supabase client so it works regardless of how
+  // each page's own auth code is scoped -- no dependency on page internals.
+  var chatSb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var history = [];
+  var panel = document.getElementById("faaChatPanel");
+  var bubble = document.getElementById("faaChatBubble");
+  var closeBtn = document.getElementById("faaChatClose");
+  var messagesEl = document.getElementById("faaChatMessages");
+  var input = document.getElementById("faaChatInput");
+  var sendBtn = document.getElementById("faaChatSend");
+
+  bubble.addEventListener("click", function(){
+    panel.style.display = panel.style.display === "none" ? "flex" : "none";
+    if (panel.style.display === "flex") input.focus();
+  });
+  closeBtn.addEventListener("click", function(){ panel.style.display = "none"; });
+
+  function addMessage(role, text){
+    var div = document.createElement("div");
+    div.className = "faaChatMsg " + role;
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return div;
+  }
+
+  function autoGrow(){
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 80) + "px";
+  }
+  input.addEventListener("input", autoGrow);
+  input.addEventListener("keydown", function(e){
+    if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); send(); }
+  });
+  sendBtn.addEventListener("click", send);
+
+  async function send(){
+    var text = input.value.trim();
+    if (!text) return;
+    input.value = "";
+    autoGrow();
+    sendBtn.disabled = true;
+
+    addMessage("user", text);
+    history.push({ role: "user", content: text });
+    var pending = addMessage("pending", "Thinking…");
+
+    try {
+      var { data: { session } } = await chatSb.auth.getSession();
+      if (!session) {
+        pending.remove();
+        addMessage("error", "Please log in to use the assistant.");
+        sendBtn.disabled = false;
+        return;
+      }
+
+      var res = await fetch(FUNCTION_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + session.access_token
+        },
+        body: JSON.stringify({ messages: history })
+      });
+      var data = await res.json();
+      pending.remove();
+
+      if (!res.ok || data.error) {
+        addMessage("error", data.error || "Something went wrong. Please try again.");
+        history.pop();
+      } else {
+        addMessage("bot", data.reply);
+        history.push({ role: "assistant", content: data.reply });
+      }
+    } catch (err) {
+      pending.remove();
+      addMessage("error", "Couldn't reach the assistant. Check your connection and try again.");
+      history.pop();
+    }
+    sendBtn.disabled = false;
+  }
+})();
+</script>
+
 <script>
 const SUPABASE_URL = 'https://ygbtbhyvpworrmuezsrf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYnRiaHl2cHdvcnJtdWV6c3JmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4ODQ2ODAsImV4cCI6MjEwMDQ2MDY4MH0.sSDhdcUPvSqDkaKakUHJSjEszVAaibEYwGqiDPh6Tc8';
