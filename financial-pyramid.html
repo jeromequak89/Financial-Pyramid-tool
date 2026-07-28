@@ -174,7 +174,16 @@
     .pyramid-flex{display:block !important;}
     .pyramid-svg{display:block;margin:0 auto 14px;}
     a.card{box-shadow:none;}
+    .print-section-header,.print-closing-footer{display:flex !important;}
   }
+  .print-section-header{display:none;align-items:center;gap:10px;border-bottom:1.5px solid var(--navy);padding-bottom:10px;margin-bottom:16px;}
+  .print-section-header img{height:24px;width:auto;flex-shrink:0;}
+  .print-section-header .psh-brand{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);}
+  .print-section-header .psh-section{font-family:'Fraunces',serif;font-size:14px;font-weight:700;color:var(--navy-deep);margin-left:auto;}
+  .print-closing-footer{display:none;align-items:center;justify-content:space-between;border-top:1.5px solid var(--navy);margin-top:22px;padding-top:12px;}
+  .print-closing-footer img{height:20px;width:auto;opacity:.8;}
+  .print-closing-footer .pcf-left{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);}
+  .print-closing-footer .pcf-right{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--slate);}
 
   /* Phone: goal rows become stacked mini-cards instead of a cramped 5-column grid */
   @media (max-width:600px){
@@ -260,11 +269,12 @@
     <div class="layout">
       <div class="inputs">
         <div class="card">
-          <h3><span class="n">1</span><span id="t-c1h">Death &amp; TPD</span></h3>
+          <h3><span class="n">1</span><span id="t-c1h">Death, TPD &amp; Terminal Illness</span></h3>
           <div class="radiorow">
             <label><input type="radio" name="dtpdMethod" value="10x" checked> <span id="t-dtpd10x">×10 annual income</span></label>
             <label><input type="radio" name="dtpdMethod" value="years"> <span id="t-dtpdyears">Years to dependent-independence</span></label>
           </div>
+          <div class="notebox" id="t-c1note">Death is tracked on its own below. TPD and Terminal Illness are tracked together, since policies usually bundle them under one sum assured. Both use the same required-amount method above.</div>
         </div>
 
         <div class="card">
@@ -310,6 +320,11 @@
   </div>
 
   <div class="panel" id="panel-accumulation">
+    <div class="print-section-header">
+      <img class="print-logo-clone" alt="">
+      <span class="psh-brand">Financial Architects Advisory</span>
+      <span class="psh-section" id="t-pshaccum">Wealth Accumulation</span>
+    </div>
     <div class="layout">
       <div class="inputs">
         <div class="card">
@@ -354,6 +369,11 @@
   </div>
 
   <div class="panel" id="panel-summary">
+    <div class="print-section-header">
+      <img class="print-logo-clone" alt="">
+      <span class="psh-brand">Financial Architects Advisory</span>
+      <span class="psh-section" id="t-pshsummary">Summary &amp; Shortfall</span>
+    </div>
     <div class="cta" id="ctaBanner"></div>
 
     <div class="card">
@@ -384,6 +404,11 @@
       <p style="font-size:12px;color:var(--slate);margin:0 0 10px;" id="t-s4sub">Every policy entered under Protection and Accumulation, grouped by company — the client's copy of what they hold today.</p>
       <div id="policySummaryContainer"></div>
       <div class="plainnote" id="t-s4empty"></div>
+    </div>
+
+    <div class="print-closing-footer">
+      <div class="pcf-left"><img class="print-logo-clone" alt="">Financial Architects Advisory · <span id="t-pcfconfidential">Confidential</span></div>
+      <div class="pcf-right" id="printGeneratedDate"></div>
     </div>
   </div>
 
@@ -541,11 +566,12 @@ en: {
   alertSelect:"Select a saved client to load.", confirmDelete:function(n){ return 'Delete saved client "'+n+'"?'; },
   confidentialNamed:function(n){ return 'CONFIDENTIAL — Prepared for '+n+' by Financial Architects Advisory. For the intended recipient only. Not for redistribution.'; },
   confidentialGeneric:"CONFIDENTIAL — Prepared by Financial Architects Advisory. For the intended recipient only. Not for redistribution.",
+  pcfconfidential:"Confidential",
   clientname:"Client name", age:"Age", netmonthly:"Net monthly income", netmonthlyhint:"take-home, after CPF/tax",
   expenses:"Monthly expenses", yearsdep:"Yrs to youngest dependent working", yearsdephint:"0 if no dependents",
   avgdrawn:"Avg. monthly drawn income", avgdrawnhint:"for income protection calc",
   tabprotection:"Wealth Protection", tabaccumulation:"Wealth Accumulation", tabsummary:"Summary & Shortfall",
-  c1h:"Death & TPD", dtpd10x:"×10 annual income", dtpdyears:"Years to dependent-independence", existdtpd:"Existing Death/TPD coverage",
+  c1h:"Death, TPD & Terminal Illness", c1note:"Death is tracked on its own below. TPD and Terminal Illness are tracked together, since policies usually bundle them under one sum assured. Both use the same required-amount method above.", dtpd10x:"×10 annual income", dtpdyears:"Years to dependent-independence", existdtpd:"Existing Death/TPD coverage",
   c2h:"Critical & Early Critical Illness", existci:"Existing CI coverage", existeci:"Existing ECI coverage",
   c2note:"CI required = $150,000 + 5× annual income. ECI required = higher of $150,000 or 25% of CI required.",
   c3h:"Accident", c3bh:"Hospitalisation", c3bnote:"Qualitative cover, not a dollar amount — a hospital plan usually has two parts. Add each below: set Benefit Type to \"Hospitalisation (Main Plan)\" for the Integrated Shield Plan, and a separate row set to \"Hospitalisation (Rider)\" for the rider that covers the copay/deductible. The pyramid shows both separately, since having one without the other is a common gap.",
@@ -557,7 +583,7 @@ en: {
   c5h:"Existing Protection Policies", c5sub:"Every policy the client already holds — this list drives the Existing column on the Summary tab and becomes the client's policy summary.",
   addpolicy:"Add policy", polCompany:"Company", polName:"Policy Name", polNumber:"Policy No.", polType:"Benefit Type", polSumAssured:"Sum Assured", polPremium:"Annual Premium", polAddBenefit:"Add another benefit on this policy", polPlaceholderName:"e.g. PRUShield",
   polSelectCompany:"— Select company —", polOther:"Other", polOtherPlaceholder:"Enter company name",
-  typeDeathTPD:"Death & TPD", typeCI:"Critical Illness", typeECI:"Early CI", typeAccident:"Accident", typeHospMain:"Hospitalisation (Main Plan)", typeHospRider:"Hospitalisation (Rider)", typeLTC:"Long-Term Care (/mo)", typeIP:"Income Protection (/mo)",
+  typeDeath:"Death", typeTPDTI:"TPD & Terminal Illness", typeCI:"Critical Illness", typeECI:"Early CI", typeAccident:"Accident", typeHospMain:"Hospitalisation (Main Plan)", typeHospRider:"Hospitalisation (Rider)", typeLTC:"Long-Term Care (/mo)", typeIP:"Income Protection (/mo)",
   hospFlag:function(main, rider){ return 'Main '+(main?'✓':'✕')+' · Rider '+(rider?'✓':'✕'); },
   rowHospitalisation:"Hospitalisation", hospRequiredLabel:"Main Plan + Rider",
   hospGapNone:"Not covered", hospGapMain:"Main Plan missing", hospGapRider:"Rider missing",
@@ -577,7 +603,7 @@ en: {
   noCompany:"Company not specified", policyCount:function(n){ return n + (n===1 ? ' policy' : ' policies'); },
   thcategory:"Category", thcompany:"Company", thpolicyname:"Policy Name", thpolicynum:"Policy No.", thamount:"Amount", thpremium:"Annual Premium",
   s4empty:"No policies entered yet — add them under the Protection and Accumulation tabs.", catProtection:"Protection", catAccumulation:"Accumulation",
-  rowDeathTPD:"Death / TPD", rowCI:"Critical Illness", rowECI:"Early CI", rowAccident:"Accident (to $1M)",
+  rowDeath:"Death", rowTPDTI:"TPD & Terminal Illness", rowCI:"Critical Illness", rowECI:"Early CI", rowAccident:"Accident (to $1M)",
   rowIP:"Income Protection (/mo)", rowLTC:"Long-Term Care (/mo)",
   cfExpenses:"Expenses (cap 40%)", cfProtection:"Wealth Protection (15% ±5%)", cfMid:"Save/Invest Mid-term (25% ±5%)", cfLong:"Invest Long-term (20% ±5%)",
   ctaHeader:function(c){ return '⚠ PRIORITY ACTION — '+c+' coverage gap'+(c>1?'s':'')+' to close'; },
@@ -591,10 +617,11 @@ en: {
   expOver:function(amt){ return 'Expenses exceed the 40% guideline by '+amt+'/mo.'; }, expOk:"Expenses within the 40% guideline.",
   altYears:function(amt){ return 'Alternative Death/TPD basis (years-to-independence): '+amt+'.'; }, alt10x:function(amt){ return 'Alternative Death/TPD basis (×10 annual income): '+amt+'.'; },
   bandsProtection:[
-    {l:"Death & TPD", r:"\u00D710 annual income, or years to youngest dependent's independence"},
+    {l:"Death", r:"\u00D710 annual income, or years to youngest dependent's independence"},
+    {l:"TPD & Terminal Illness", r:"\u00D710 annual income, or years to youngest dependent's independence"},
     {l:"Critical Illness", r:"$150,000 + 5\u00D7 annual income"},
     {l:"Early CI", r:"higher of $150,000 or 25% of CI"},
-    {l:"Accident", r:"tops up Death/TPD to a combined $1,000,000"},
+    {l:"Accident", r:"tops up Death to a combined $1,000,000"},
     {l:"Hospitalisation", r:"via Integrated Shield Plan + Rider"},
     {l:"Long-Term Care", r:"monthly payout + 3\u00D7 lump sum"},
     {l:"Income Protection", r:"up to 75% of average drawn income"}
@@ -614,11 +641,12 @@ zh: {
   alertSelect:"请选择要载入的客户。", confirmDelete:function(n){ return '确定要删除已保存的客户「'+n+'」吗？'; },
   confidentialNamed:function(n){ return '保密文件 — 由 Financial Architects Advisory 为'+n+'编制，仅供收件人查阅，请勿转发。'; },
   confidentialGeneric:"保密文件 — 由 Financial Architects Advisory 编制，仅供收件人查阅，请勿转发。",
+  pcfconfidential:"保密文件",
   clientname:"客户姓名", age:"年龄", netmonthly:"每月净收入", netmonthlyhint:"实收款项（扣除公积金/税后）",
   expenses:"每月支出", yearsdep:"距最小受抚养人开始工作年数", yearsdephint:"若无受抚养人则填0",
   avgdrawn:"平均每月提取收入", avgdrawnhint:"用于收入保障计算",
   tabprotection:"财富保障", tabaccumulation:"财富累积", tabsummary:"总结与缺口",
-  c1h:"身故与全残保障", dtpd10x:"年收入的10倍", dtpdyears:"至受抚养人经济独立的年数", existdtpd:"现有身故/全残保额",
+  c1h:"身故、全残与末期疾病", c1note:"「身故」在下方单独追踪。「全残」与「末期疾病」合并追踪，因为保单通常将两者归入同一份保额。两者均使用上方相同的所需保额计算方式。", dtpd10x:"年收入的10倍", dtpdyears:"至受抚养人经济独立的年数", existdtpd:"现有身故/全残保额",
   c2h:"重大疾病与早期重疾", existci:"现有重疾保额", existeci:"现有早期重疾保额",
   c2note:"所需重疾保额 = $150,000 + 年收入 × 5。所需早期重疾保额 = $150,000 与重疾保额25%中的较高者。",
   c3h:"意外", c3bh:"住院", c3bnote:"定性保障，非金额指标——住院保障通常分为两部分。请在下方分别添加：将保障类型设为「住院（主约）」以记录综合健保双全计划，另加一行设为「住院（附加险）」以记录承担自付额/垫底费的附加险。金字塔会分别显示两者，因为只有其中一项而缺少另一项是常见的保障缺口。",
@@ -630,7 +658,7 @@ zh: {
   c5h:"现有保障保单", c5sub:"客户目前持有的每一份保单——此列表将用于总结页的「现有」栏位，并生成客户的保单总览。",
   addpolicy:"添加保单", polCompany:"保险公司", polName:"保单名称", polNumber:"保单号码", polType:"保障类型", polSumAssured:"保额", polPremium:"年缴保费", polAddBenefit:"在此保单下添加其他保障项目", polPlaceholderName:"例如：PRUShield",
   polSelectCompany:"— 请选择保险公司 —", polOther:"其他", polOtherPlaceholder:"请输入保险公司名称",
-  typeDeathTPD:"身故与全残", typeCI:"重大疾病", typeECI:"早期重疾", typeAccident:"意外", typeHospMain:"住院（主约）", typeHospRider:"住院（附加险）", typeLTC:"长期护理（每月）", typeIP:"收入保障（每月）",
+  typeDeath:"身故", typeTPDTI:"全残与末期疾病", typeCI:"重大疾病", typeECI:"早期重疾", typeAccident:"意外", typeHospMain:"住院（主约）", typeHospRider:"住院（附加险）", typeLTC:"长期护理（每月）", typeIP:"收入保障（每月）",
   hospFlag:function(main, rider){ return '主约 '+(main?'✓':'✕')+' · 附加险 '+(rider?'✓':'✕'); },
   rowHospitalisation:"住院", hospRequiredLabel:"主约 + 附加险",
   hospGapNone:"尚未投保", hospGapMain:"缺少主约", hospGapRider:"缺少附加险",
@@ -650,7 +678,7 @@ zh: {
   noCompany:"未注明保险公司", policyCount:function(n){ return n + '份保单'; },
   thcategory:"类别", thcompany:"保险公司", thpolicyname:"保单名称", thpolicynum:"保单号码", thamount:"金额", thpremium:"年缴保费",
   s4empty:"尚未填写任何保单——请在「财富保障」与「财富累积」页签中添加。", catProtection:"保障", catAccumulation:"累积",
-  rowDeathTPD:"身故 / 全残", rowCI:"重大疾病", rowECI:"早期重疾", rowAccident:"意外（补足至$1M）",
+  rowDeath:"身故", rowTPDTI:"全残与末期疾病", rowCI:"重大疾病", rowECI:"早期重疾", rowAccident:"意外（补足至$1M）",
   rowIP:"收入保障（每月）", rowLTC:"长期护理（每月）",
   cfExpenses:"支出（上限40%）", cfProtection:"财富保障（15%±5%）", cfMid:"中期储蓄/投资（25%±5%）", cfLong:"长期投资（20%±5%）",
   ctaHeader:function(c){ return '⚠ 优先处理 — 共'+c+'项保障缺口待补足'; },
@@ -664,10 +692,11 @@ zh: {
   expOver:function(amt){ return '支出超出40%的建议上限，每月超出'+amt+'。'; }, expOk:"支出在40%建议范围内。",
   altYears:function(amt){ return '身故/全残保额的另一计算方式（至独立年数）：'+amt+'。'; }, alt10x:function(amt){ return '身故/全残保额的另一计算方式（年收入的10倍）：'+amt+'。'; },
   bandsProtection:[
-    {l:"身故与全残", r:"年收入的10倍，或至最小受抚养人独立的年数"},
+    {l:"身故", r:"年收入的10倍，或至最小受抚养人独立的年数"},
+    {l:"全残与末期疾病", r:"年收入的10倍，或至最小受抚养人独立的年数"},
     {l:"重大疾病", r:"$150,000 + 年收入×5"},
     {l:"早期重疾", r:"$150,000 与重疾保额25%中的较高者"},
-    {l:"意外", r:"补足身故/全残保额至合计$1,000,000"},
+    {l:"意外", r:"补足身故保额至合计$1,000,000"},
     {l:"住院", r:"通过综合健保双全计划及附加险"},
     {l:"长期护理", r:"每月赔付 + 3倍一次性赔付"},
     {l:"收入保障", r:"最高为平均提取收入的75%"}
@@ -688,7 +717,7 @@ const num = function(v){ const n = parseFloat(v); return isNaN(n) ? 0 : n; };
 const money = function(n){ return '$' + Math.round(n).toLocaleString('en-US'); };
 const clamp0 = function(n){ return Math.max(0, n); };
 
-const BAND_COLORS_P = ['#14213D','#1E2E52','#2A3D67','#3A4F7E','#3F6B4F','#B0894F','#8C6A38'];
+const BAND_COLORS_P = ['#14213D','#192843','#1E2E52','#2A3D67','#3A4F7E','#3F6B4F','#B0894F','#8C6A38'];
 const BAND_COLORS_A = ['#14213D','#2A3D67','#3A4F7E','#B0894F'];
 
 function applyStaticText(){
@@ -699,7 +728,8 @@ function applyStaticText(){
     't-clientname':'clientname','t-age':'age','t-netmonthly':'netmonthly','t-netmonthlyhint':'netmonthlyhint',
     't-expenses':'expenses','t-yearsdep':'yearsdep','t-yearsdephint':'yearsdephint','t-avgdrawn':'avgdrawn','t-avgdrawnhint':'avgdrawnhint',
     't-tabprotection':'tabprotection','t-tabaccumulation':'tabaccumulation','t-tabsummary':'tabsummary',
-    't-c1h':'c1h','t-dtpd10x':'dtpd10x','t-dtpdyears':'dtpdyears',
+    't-pshaccum':'tabaccumulation','t-pshsummary':'tabsummary','t-pcfconfidential':'pcfconfidential',
+    't-c1h':'c1h','t-c1note':'c1note','t-dtpd10x':'dtpd10x','t-dtpdyears':'dtpdyears',
     't-c2h':'c2h','t-c2note':'c2note',
     't-c3h':'c3h','t-c3note':'c3note','t-c3bh':'c3bh','t-c3bnote':'c3bnote',
     't-c4h':'c4h','t-ltcdesired':'ltcdesired','t-c4note':'c4note',
@@ -715,6 +745,12 @@ function applyStaticText(){
   Object.keys(map).forEach(function(id){ const el = $(id); if (el) el.textContent = s[map[id]]; });
   $('avgDrawnIncome').placeholder = s.avgdrawn;
   updateConfidential();
+
+  const mainLogoSrc = document.querySelector('.logo').src;
+  document.querySelectorAll('.print-logo-clone').forEach(function(img){ img.src = mainLogoSrc; });
+  const dateStr = new Date().toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-SG', { year: 'numeric', month: 'long', day: 'numeric' });
+  const dateEl = $('printGeneratedDate');
+  if (dateEl) dateEl.textContent = (lang === 'zh' ? '生成日期：' : 'Generated ') + dateStr;
 }
 
 function updateConfidential(){
@@ -785,9 +821,9 @@ let protPolicies = [];
 let accPolicies = [];
 
 const COMPANIES = ['Prudential','AIA','Great Eastern','Singlife','NTUC','Manulife','Tokio Marine','HSBC','FWD'];
-const PROT_TYPES = ['DeathTPD','CI','ECI','Accident','HospMain','HospRider','LTC','IP'];
+const PROT_TYPES = ['Death','TPDTI','CI','ECI','Accident','HospMain','HospRider','LTC','IP'];
 function typeLabel(s, key){
-  const dict = { DeathTPD:s.typeDeathTPD, CI:s.typeCI, ECI:s.typeECI, Accident:s.typeAccident, HospMain:s.typeHospMain, HospRider:s.typeHospRider, Hospitalisation:s.typeHospMain, LTC:s.typeLTC, IP:s.typeIP };
+  const dict = { Death:s.typeDeath, TPDTI:s.typeTPDTI, DeathTPD:s.typeDeath, CI:s.typeCI, ECI:s.typeECI, Accident:s.typeAccident, HospMain:s.typeHospMain, HospRider:s.typeHospRider, Hospitalisation:s.typeHospMain, LTC:s.typeLTC, IP:s.typeIP };
   return dict[key] || key;
 }
 function companySelectHTML(rowId, company, s){
@@ -1185,7 +1221,8 @@ function calcAll(){
   const dtpdRequired = dtpdMethod === '10x' ? dtpd10x : dtpdYears;
 
   function sumByType(type){ return protPolicies.filter(function(p){ return p.type===type; }).reduce(function(sum,p){ return sum + num(p.amount); }, 0); }
-  const existDeathTPD = sumByType('DeathTPD');
+  const existDeath = sumByType('Death') + sumByType('DeathTPD');
+  const existTPDTI = sumByType('TPDTI');
   const existAccident = sumByType('Accident');
   const existCI = sumByType('CI');
   const existECI = sumByType('ECI');
@@ -1204,12 +1241,13 @@ function calcAll(){
   const pb = s.bandsProtection;
   const sections = [
     { label: pb[0].l, sub: pb[0].r + ' — ' + money(dtpdRequired) },
-    { label: pb[1].l, sub: pb[1].r + ' — ' + money(ciRequired) },
-    { label: pb[2].l, sub: pb[2].r + ' — ' + money(eciRequired) },
-    { label: pb[3].l, sub: pb[3].r + ' — ' + money(accidentRequired) },
-    { label: pb[4].l, sub: pb[4].r, flag: s.hospFlag(hasHospMain, hasHospRider), flagColor: (hasHospMain && hasHospRider) ? '#3F6B4F' : '#A44A3F' },
-    { label: pb[5].l, sub: money(ltcMonthly)+'/mo · '+money(ltcLump)+' lump' },
-    { label: pb[6].l, sub: pb[6].r + ' — ' + money(ipRequired)+'/mo' }
+    { label: pb[1].l, sub: pb[1].r + ' — ' + money(dtpdRequired) },
+    { label: pb[2].l, sub: pb[2].r + ' — ' + money(ciRequired) },
+    { label: pb[3].l, sub: pb[3].r + ' — ' + money(eciRequired) },
+    { label: pb[4].l, sub: pb[4].r + ' — ' + money(accidentRequired) },
+    { label: pb[5].l, sub: pb[5].r, flag: s.hospFlag(hasHospMain, hasHospRider), flagColor: (hasHospMain && hasHospRider) ? '#3F6B4F' : '#A44A3F' },
+    { label: pb[6].l, sub: money(ltcMonthly)+'/mo · '+money(ltcLump)+' lump' },
+    { label: pb[7].l, sub: pb[7].r + ' — ' + money(ipRequired)+'/mo' }
   ];
   buildPyramid($('protectionPyramid'), sections, BAND_COLORS_P);
 
@@ -1236,7 +1274,8 @@ function calcAll(){
   $('rule72out').textContent = roi > 0 ? (72/roi).toFixed(1) + (lang==='zh' ? ' 年' : ' years') : '—';
 
   const rows = [
-    [s.rowDeathTPD, dtpdRequired, existDeathTPD, 'DeathTPD'],
+    [s.rowDeath, dtpdRequired, existDeath, 'Death'],
+    [s.rowTPDTI, dtpdRequired, existTPDTI, 'TPDTI'],
     [s.rowCI, ciRequired, existCI, 'CI'],
     [s.rowECI, eciRequired, existECI, 'ECI'],
     [s.rowAccident, accidentRequired, existAccident, 'Accident'],
@@ -1250,10 +1289,10 @@ function calcAll(){
     const label = row[0], req = row[1], ex = row[2], key = row[3];
     const short = clamp0(req - ex);
     const pct = req > 0 ? Math.min(100, (ex/req)*100) : 100;
-    if (short > 0) gaps.push({ label: label, short: short, isMonthly: idx >= 4, key: key });
+    if (short > 0) gaps.push({ label: label, short: short, isMonthly: idx >= 5, key: key });
     const tr = document.createElement('tr');
     tr.innerHTML = '<td>'+label+'</td><td>'+money(req)+'</td><td>'+money(ex)+'</td>'+
-      '<td class="'+(short>0?'shortfall-neg':'shortfall-ok')+'">'+(short>0? money(short)+(idx>=4?'/mo':'') : s.fullyfunded)+'</td>'+
+      '<td class="'+(short>0?'shortfall-neg':'shortfall-ok')+'">'+(short>0? money(short)+(idx>=5?'/mo':'') : s.fullyfunded)+'</td>'+
       '<td class="barcell"><div class="bartrack"><div class="barfill" style="width:'+pct+'%"></div></div></td>';
     tbody.appendChild(tr);
   });
@@ -1272,7 +1311,7 @@ function calcAll(){
 
   const cta = $('ctaBanner');
   // Fixed priority order (not sorted by dollar size): CI, Early CI, Income Protection, Accident, then Death/TPD, LTC.
-  const PRIORITY_KEYS = ['CI','ECI','IP','Accident','DeathTPD','LTC'];
+  const PRIORITY_KEYS = ['CI','ECI','IP','Accident','Death','TPDTI','LTC'];
   const gapsByKey = {};
   gaps.forEach(function(g){ gapsByKey[g.key] = g; });
   const orderedGaps = PRIORITY_KEYS.map(function(k){ return gapsByKey[k]; }).filter(Boolean);
